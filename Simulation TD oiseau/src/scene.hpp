@@ -13,10 +13,13 @@ using cgp::numarray;
 using cgp::timer_basic;
 
 
+// The element of the GUI that are not already stored in other structures
 struct gui_parameters {
 	bool display_frame = true;
 	bool display_wireframe = false;
 };
+
+
 
 // The structure of the custom scene
 struct scene_structure : cgp::scene_inputs_generic {
@@ -24,6 +27,7 @@ struct scene_structure : cgp::scene_inputs_generic {
 	// ****************************** //
 	// Elements and shapes of the scene
 	// ****************************** //
+
 	camera_controller_orbit_euler camera_control;
 	camera_projection_perspective camera_projection;
 	window_structure window;
@@ -32,27 +36,16 @@ struct scene_structure : cgp::scene_inputs_generic {
 	environment_structure environment;   // Standard environment controler
 	input_devices inputs;                // Storage for inputs status (mouse, keyboard, window dimension)
 	gui_parameters gui;                  // Standard GUI element storage
-	
+
 	// ****************************** //
 	// Elements and shapes of the scene
 	// ****************************** //
 
-	void simulation_step(float dt);
-	void draw_segment(vec3 const& a, vec3 const& b);
-
-	// Drawable structure to display the particles and the spring
-	mesh_drawable particle_sphere;
-	curve_drawable segment;
-
 	// Timer used for the animation
 	timer_basic timer;
 
-	// Particles:
-	int N=30;
-	vec3* positions = new vec3 [N];
-	vec3* vitesses = new vec3 [N];
-	vec3* forces = new vec3 [N];
-	float L0; // Rest-length of spring
+	// The entire hierarchy
+	cgp::hierarchy_mesh_drawable hierarchy;
 
 
 	// ****************************** //
@@ -67,6 +60,9 @@ struct scene_structure : cgp::scene_inputs_generic {
 	void mouse_click_event();
 	void keyboard_event();
 	void idle_frame();
-
 };
+
+
+
+
 
