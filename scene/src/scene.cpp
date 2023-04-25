@@ -17,7 +17,7 @@ void scene_structure::initialize()
 	float room_length = 10.0f;
 	float room_depth = 5.0f;
 	float room_height = 2.0f;
-	mesh const room_mesh = create_room_mesh(room_length, room_depth, room_height)
+	mesh const room_mesh = create_room_mesh(room_length, room_depth, room_height);
 	room.initialize_data_on_gpu(room_mesh);
 	
 	room.material.color = { 0.6f,0.85f,0.5f };

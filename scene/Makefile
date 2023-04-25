@@ -1,10 +1,10 @@
-# This Makefile will generate an executable file named a_hierarchy
+# This Makefile will generate an executable file named projet
 
 # This path should point to the CGP library depending on the current directory
 ## You may need to it in case you move the position of your directory
-PATH_TO_CGP = ../../../cgp/library/
+PATH_TO_CGP = ../cgp/library/
 
-TARGET ?= a_hierarchy #name of the executable
+TARGET ?= projet #name of the executable
 SRC_DIRS ?= src/ $(PATH_TO_CGP)
 CXX = g++ #Or clang++
 

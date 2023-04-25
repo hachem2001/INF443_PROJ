@@ -63,7 +63,7 @@ mesh create_room_mesh(float room_length, float room_depth, float room_height)
 	mesh wall_6 = create_wall_mesh(room_length*(0.1f), room_height, 0);
 
     //colors
-    sol.color.fill({0.4f, 0.3f, 0.3f})
+    sol.color.fill({0.4f, 0.3f, 0.3f});
 
 	//Assemble
     wall_3.apply_translation_to_position({room_length,0,0}); 
