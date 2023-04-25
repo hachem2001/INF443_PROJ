@@ -14,14 +14,23 @@ void scene_structure::initialize()
 	global_frame.initialize_data_on_gpu(mesh_primitive_frame());
 
 
-	float room_length = 10.0f;
-	float room_depth = 5.0f;
+	float room_length = 5.0f;
+	float room_depth = 2.0f;
 	float room_height = 2.0f;
-	mesh const room_mesh = create_room_mesh(room_length, room_depth, room_height);
-	room.initialize_data_on_gpu(room_mesh);
+
+	mesh room1_mesh = create_room_mesh(room_length, room_depth, room_height);
+	room1_mesh.apply_translation_to_position({1.0f, -room_depth-1.0f, 0});
+	room1.initialize_data_on_gpu(room1_mesh);
 	
-	room.material.color = { 0.6f,0.85f,0.5f };
-	room.material.phong.specular = 0.0f; // non-specular terrain material
+	room1.material.color = { 0.6f,0.85f,0.5f };
+	room1.material.phong.specular = 0.0f; // non-specular terrain material
+
+	mesh room2_mesh = create_room_mesh(room_length, room_depth, room_height);
+	room2_mesh.apply_translation_to_position({-room_length-1.0f, -room_depth-1.0f, 0});
+	room2.initialize_data_on_gpu(room1_mesh);
+	
+	room2.material.color = { 0.6f,0.85f,0.5f };
+	room2.material.phong.specular = 0.0f; // non-specular terrain material
 
 }
 
@@ -34,13 +43,15 @@ void scene_structure::display_frame()
 	if (gui.display_frame)
 		draw(global_frame, environment);
 
-	draw(room, environment);
+	draw(room1, environment);
+	draw(room2, environment);
 	
 	
 	// draw(cylinder, environment);
 	// draw(cone,environment);
 	if (gui.display_wireframe)
-		draw_wireframe(room, environment);
+		draw_wireframe(room1, environment);
+		draw_wireframe(room2, environment);
 
 }
 
