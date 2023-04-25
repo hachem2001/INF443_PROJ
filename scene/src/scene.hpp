@@ -19,8 +19,6 @@ struct gui_parameters {
 	bool display_wireframe = false;
 };
 
-
-
 // The structure of the custom scene
 struct scene_structure : cgp::scene_inputs_generic {
 	
@@ -41,12 +39,7 @@ struct scene_structure : cgp::scene_inputs_generic {
 	// Elements and shapes of the scene
 	// ****************************** //
 
-	// Timer used for the animation
-	timer_basic timer;
-
-	// The entire hierarchy
-	cgp::hierarchy_mesh_drawable hierarchy;
-
+	cgp::mesh_drawable room;
 
 	// ****************************** //
 	// Functions
