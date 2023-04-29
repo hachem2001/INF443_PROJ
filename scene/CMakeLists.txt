@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.8)
 
 # Relative path to the CGP library
 # => You may need to adapt this directory to your relative path in the case you move your directory
-set(PATH_TO_CGP "../../cgp/library/" CACHE PATH "Relative path to CGP library location") 
+set(PATH_TO_CGP "../cgp/library/" CACHE PATH "Relative path to CGP library location") 
 
 # Check that the path to the library is correct
 get_filename_component(ABS_PATH_TO_CGP ${PATH_TO_CGP} ABSOLUTE)
@@ -15,7 +15,7 @@ else()
 endif()
 
 # Compile for Release with Debug Info
-set(CMAKE_BUILD_TYPE RelWithDebInfo) 
+#set(CMAKE_BUILD_TYPE RelWithDebInfo) 
 
 # List the files of the current local project 
 #    Default behavior: Automatically add all hpp and cpp files from src/ directory, and .glsl from shaders/
