@@ -1,0 +1,3 @@
+/home/hachem/Code/college/INF433/Projet/INF443_PROJ/build/CMakeFiles/scene.dir
+/home/hachem/Code/college/INF433/Projet/INF443_PROJ/build/CMakeFiles/edit_cache.dir
+/home/hachem/Code/college/INF433/Projet/INF443_PROJ/build/CMakeFiles/rebuild_cache.dir
