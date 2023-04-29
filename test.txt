@@ -1,9 +1,0 @@
-hello world
-Hello there!
-How are you ?
-Je m'appelle Hachem!
-Et moi c'est Gaëlle :)
-Le monde est petit!
-
-Est-ce que ça fonctionne?
-Ca fonctionne ! 
