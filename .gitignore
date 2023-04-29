@@ -34,4 +34,4 @@
 # build directories and .vscode
 .vscode/
 build/
-*/build/
+scene/build/
