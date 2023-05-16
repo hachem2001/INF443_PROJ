@@ -32,21 +32,21 @@ void scene_structure::initialize()
 	room2_mesh.apply_translation_to_position({room1_length+1.0f, 0, 0});
 	room2.initialize_data_on_gpu(room2_mesh);
 	
-	room2.material.color = { 0.6f,0.85f,0.5f };
+	room2.material.color = { 0.5f,0.5f,0.7f };
 	room2.material.phong.specular = 0.0f; // non-specular terrain material
 
 	mesh room3_mesh = create_room_mesh(room3_length, room_depth, room_height);
 	room3_mesh.apply_translation_to_position({room1_length+room2_length+2.0f, 0, 0});
 	room3.initialize_data_on_gpu(room3_mesh);
 	
-	room3.material.color = { 0.6f,0.85f,0.5f };
+	room3.material.color = { 0.7f,0.5f,0.5f };
 	room3.material.phong.specular = 0.0f; // non-specular terrain material
 
 	mesh room4_mesh = create_room_mesh(room4_length, room_depth, room_height);
 	room4_mesh.apply_translation_to_position({room1_length+room2_length+room3_length+3.0f, 0, 0});
 	room4.initialize_data_on_gpu(room4_mesh);
 	
-	room4.material.color = { 0.6f,0.85f,0.5f };
+	room4.material.color = { 0.5f,0.5f,0.5f };
 	room4.material.phong.specular = 0.0f; // non-specular terrain material
 
 }
