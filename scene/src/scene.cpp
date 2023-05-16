@@ -1,6 +1,7 @@
 #include "scene.hpp"
 
 #include "room.hpp"
+#include "camera_controller_custom.hpp"
 
 using namespace cgp;
 
@@ -9,8 +10,8 @@ void scene_structure::initialize()
 	// Basic set-up
 	// ***************************************** //
 	camera_control.initialize(inputs, window); // Give access to the inputs and window global state to the camera controler
-	camera_control.set_rotation_axis_z();
-	camera_control.look_at({ 15.0f,6.0f,6.0f }, {0,0,0});
+	//camera_control.set_rotation_axis_z();
+	//camera_control.look_at({ 15.0f,6.0f,6.0f }, {0,0,0});
 	global_frame.initialize_data_on_gpu(mesh_primitive_frame());
 
 
@@ -27,7 +28,7 @@ void scene_structure::initialize()
 
 	mesh room2_mesh = create_room_mesh(room_length, room_depth, room_height);
 	room2_mesh.apply_translation_to_position({-room_length-1.0f, -room_depth-1.0f, 0});
-	room2.initialize_data_on_gpu(room1_mesh);
+	room2.initialize_data_on_gpu(room2_mesh);
 	
 	room2.material.color = { 0.6f,0.85f,0.5f };
 	room2.material.phong.specular = 0.0f; // non-specular terrain material

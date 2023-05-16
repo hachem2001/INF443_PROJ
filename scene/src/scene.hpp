@@ -4,6 +4,8 @@
 #include "cgp/cgp.hpp"
 #include "environment.hpp"
 
+#include "camera_controller_custom.hpp"
+
 
 // This definitions allow to use the structures: mesh, mesh_drawable, etc. without mentionning explicitly cgp::
 using cgp::mesh;
@@ -26,7 +28,7 @@ struct scene_structure : cgp::scene_inputs_generic {
 	// Elements and shapes of the scene
 	// ****************************** //
 
-	camera_controller_orbit_euler camera_control;
+	camera_controller_custom camera_control;
 	camera_projection_perspective camera_projection;
 	window_structure window;
 
