@@ -43,14 +43,12 @@ void scene_structure::display_frame()
 	if (gui.display_frame)
 		draw(global_frame, environment);
 
-	draw(room1, environment);
+	//draw(room1, environment);
 	draw(room2, environment);
 	
-	
-	// draw(cylinder, environment);
-	// draw(cone,environment);
+
 	if (gui.display_wireframe)
-		draw_wireframe(room1, environment);
+		//draw_wireframe(room1, environment);
 		draw_wireframe(room2, environment);
 
 }
