@@ -17,7 +17,7 @@ void scene_structure::initialize()
 	float room1_length = 5.0f; //more than 4.0f
 	float room2_length = 10.0f; //more than 4.0f
 	float room3_length = 4.0f; //more than 4.0f
-	float room4_length = 6.0f; //more than 4.0f
+	float room4_length = 8.0f; //more than 4.0f
 	float room_depth = 2.0f;
 	float room_height = 2.0f;
 
@@ -43,7 +43,7 @@ void scene_structure::initialize()
 	room3.material.phong.specular = 0.0f; // non-specular terrain material
 
 	mesh room4_mesh = create_room_mesh(room4_length, room_depth, room_height);
-	room4_mesh.apply_translation_to_position({room1_length+room2_length+room3_length+4.0f, 0, 0});
+	room4_mesh.apply_translation_to_position({room1_length+room2_length+room3_length+3.0f, 0, 0});
 	room4.initialize_data_on_gpu(room4_mesh);
 	
 	room4.material.color = { 0.6f,0.85f,0.5f };

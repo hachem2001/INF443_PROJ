@@ -3,6 +3,8 @@
 
 #include "cgp/cgp.hpp"
 #include "environment.hpp"
+#include "room.hpp"
+#include "portal.hpp"
 
 
 // This definitions allow to use the structures: mesh, mesh_drawable, etc. without mentionning explicitly cgp::
