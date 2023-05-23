@@ -1,7 +1,6 @@
 #pragma once
 
 #include "cgp/cgp.hpp"
-//#include "cgp/graphics/camera/camera_controller/camera_controller_generic_base/camera_controller_generic_base.hpp"
 
 using namespace cgp;
 
@@ -9,6 +8,11 @@ struct camera_controller_custom : camera_controller_generic_base
 {
 	camera_first_person_euler camera_model;
 
+	/// @brief Sets rotation axis of camera to z up.
+	void set_rotation_axis_z();
+
+	/// @brief Update camera rotation when the mouse moves.
+	/// @param camera_matrix_view 
 	void action_mouse_move(mat4& camera_matrix_view);
 
 	// Key 'C' (in capital) to capture the cursor

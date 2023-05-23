@@ -10,8 +10,8 @@ void scene_structure::initialize()
 	// Basic set-up
 	// ***************************************** //
 	camera_control.initialize(inputs, window); // Give access to the inputs and window global state to the camera controler
-	//camera_control.set_rotation_axis_z();
-	//camera_control.look_at({ 15.0f,6.0f,6.0f }, {0,0,0});
+	camera_control.set_rotation_axis_z();
+	camera_control.camera_model.look_at({ 15.0f,6.0f,6.0f }, {0,0,0});
 	global_frame.initialize_data_on_gpu(mesh_primitive_frame());
 
 

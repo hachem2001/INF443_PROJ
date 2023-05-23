@@ -22,16 +22,16 @@ void camera_controller_custom::action_mouse_move(mat4& camera_matrix_view)
 	bool const click_left = inputs->mouse.click.left;
 	bool const click_right = inputs->mouse.click.right;
 
-
 	if (event_valid) {
-		if (!is_cursor_trapped) {
+		if (!is_cursor_trapped)  {
 			if (click_left)
 				camera_model.manipulator_rotate_roll_pitch_yaw(0, dp.y, -dp.x);
 			else if (click_right)
 				camera_model.manipulator_translate_front(-(p1 - p0).y);
 		}
-		else if (is_cursor_trapped)
+		else if (is_cursor_trapped) {
 			camera_model.manipulator_rotate_roll_pitch_yaw(0, dp.y, -dp.x);
+		}
 	}
 
 	update(camera_matrix_view);
@@ -69,15 +69,25 @@ void camera_controller_custom::idle_frame(mat4& camera_matrix_view)
 		camera_model.manipulator_translate_in_plane({ 0,-magnitude });
 	if (inputs->keyboard.is_pressed(GLFW_KEY_F))
 		camera_model.manipulator_translate_in_plane({ 0, magnitude });
-	if (inputs->keyboard.is_pressed(GLFW_KEY_A))
+	if (inputs->keyboard.is_pressed(GLFW_KEY_A)) {
+		//camera_model.position_camera += vec3{-magnitude, 0, 0};
 		camera_model.manipulator_translate_in_plane({ magnitude ,0 });
-	if (inputs->keyboard.is_pressed(GLFW_KEY_D))
-		camera_model.manipulator_translate_in_plane({ -magnitude ,0 });
-	if (inputs->keyboard.is_pressed(GLFW_KEY_W))
-		camera_model.manipulator_translate_front(-magnitude);
-	if (inputs->keyboard.is_pressed(GLFW_KEY_S))
-		camera_model.manipulator_translate_front(magnitude);
+	}
+	if (inputs->keyboard.is_pressed(GLFW_KEY_D)) {
+		//camera_model.position_camera += vec3{magnitude, 0, 0};
 
+		camera_model.manipulator_translate_in_plane({ -magnitude ,0 });
+}
+	if (inputs->keyboard.is_pressed(GLFW_KEY_W)) {
+		//camera_model.position_camera += vec3{0, magnitude, 0};
+	
+		camera_model.manipulator_translate_front(-magnitude);
+	}
+	if (inputs->keyboard.is_pressed(GLFW_KEY_S)) {
+		//camera_model.position_camera += vec3{0, -magnitude, 0};
+
+		camera_model.manipulator_translate_front(magnitude);
+	}
 	// with arrows:
 	if (inputs->keyboard.ctrl == false) {
 		if (inputs->keyboard.up)
@@ -98,4 +108,9 @@ void camera_controller_custom::idle_frame(mat4& camera_matrix_view)
 
 
 	update(camera_matrix_view);
+}
+
+void camera_controller_custom::set_rotation_axis_z()
+{
+	camera_model.set_rotation_axis({0,0,1});
 }
