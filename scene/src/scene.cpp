@@ -6,8 +6,6 @@
 #include "cgp/graphics/opengl/opengl.hpp"
 #include "libs/glm-master/glm/glm.hpp"
 
-glm::mat3 a;
-
 using namespace cgp;
 
 void scene_structure::initialize()
