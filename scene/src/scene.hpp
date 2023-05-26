@@ -3,6 +3,8 @@
 
 #include "cgp/cgp.hpp"
 #include "environment.hpp"
+#include "room.hpp"
+#include "portal.hpp"
 
 #include "camera_controller_custom.hpp"
 
@@ -45,6 +47,15 @@ struct scene_structure : cgp::scene_inputs_generic {
 	cgp::mesh_drawable room2;
 	cgp::mesh_drawable room3;
 	cgp::mesh_drawable room4;
+
+	cgp::mesh_drawable portal12;
+	cgp::mesh_drawable portal14;
+	cgp::mesh_drawable portal21;
+	cgp::mesh_drawable portal23;
+	cgp::mesh_drawable portal32;
+	cgp::mesh_drawable portal34;
+	cgp::mesh_drawable portal43;
+	cgp::mesh_drawable portal41;
 
 	// ****************************** //
 	// Functions

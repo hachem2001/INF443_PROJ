@@ -1,7 +1,17 @@
 #pragma once
 
 #include "cgp/cgp.hpp"
+#include "portal.hpp"
+#include "environment.hpp"
 
-cgp::mesh create_floor_mesh(float length, float depth);
-cgp::mesh create_wall_mesh(float length, float height, int direction);
+
+class room {
+    public:
+        cgp::mesh room_mesh;
+        int nb;
+        portal first;
+        portal second;
+
+};
+
 cgp::mesh create_room_mesh(float room_length, float room_depth, float room_height);
