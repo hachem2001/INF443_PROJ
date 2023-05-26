@@ -30,7 +30,6 @@ void scene_structure::initialize()
 	room1.initialize_data_on_gpu(room1_mesh);
 	
 	room1.material.color = { 0.6f,0.85f,0.5f };
-	room1.material.phong.specular = 0.0f; // non-specular terrain material
 
 	//room 2
 	mesh room2_mesh = create_room_mesh(room2_length, room_depth, room_height);
@@ -38,7 +37,6 @@ void scene_structure::initialize()
 	room2.initialize_data_on_gpu(room2_mesh);
 	
 	room2.material.color = { 0.5f,0.5f,0.7f };
-	room2.material.phong.specular = 0.0f; // non-specular terrain material
 
 	// room 3
 	mesh room3_mesh = create_room_mesh(room3_length, room_depth, room_height);
@@ -46,7 +44,6 @@ void scene_structure::initialize()
 	room3.initialize_data_on_gpu(room3_mesh);
 	
 	room3.material.color = { 0.7f,0.5f,0.5f };
-	room3.material.phong.specular = 0.0f; // non-specular terrain material
 
 	// room 4
 	mesh room4_mesh = create_room_mesh(room4_length, room_depth, room_height);
@@ -54,42 +51,38 @@ void scene_structure::initialize()
 	room4.initialize_data_on_gpu(room4_mesh);
 	
 	room4.material.color = { 0.5f,0.5f,0.5f };
-	room4.material.phong.specular = 0.0f; // non-specular terrain material
 
 	// ***************************************** //
 	// Set-up portals
 	// ***************************************** //
-	mesh portal14_mesh = create_portal_mesh(room_height);
-	portal14_mesh.apply_translation_to_position({0.5f, room_depth, 0});
-	portal14.initialize_data_on_gpu(portal14_mesh);
+	glm::vec4 portal_vertices[] = {
+    glm::vec4(-1, -1, 0, 1),
+    glm::vec4( 1, -1, 0, 1),
+    glm::vec4(-1,  1, 0, 1),
+    glm::vec4( 1,  1, 0, 1),
+  };
+  for (unsigned int i = 0; i < sizeof(portal_vertices)/sizeof(portal_vertices[0]); i++) {
+    portals[0].vertices.push_back(portal_vertices[i]);
+    portals[1].vertices.push_back(portal_vertices[i]);
+  }
 
-	mesh portal12_mesh = create_portal_mesh(room_height);
-	portal12_mesh.apply_translation_to_position({room1_length-1.5f, room_depth, 0});
-	portal12.initialize_data_on_gpu(portal12_mesh);
+  GLushort portal_elements[] = {
+    0,1,2, 2,1,3,
+  };
+  for (unsigned int i = 0; i < sizeof(portal_elements)/sizeof(portal_elements[0]); i++) {
+    portals[0].elements.push_back(portal_elements[i]);
+    portals[1].elements.push_back(portal_elements[i]);
+  }
 
-	mesh portal21_mesh = create_portal_mesh(room_height);
-	portal21_mesh.apply_translation_to_position({0.5f+room1_length+1.0f, room_depth, 0});
-	portal21.initialize_data_on_gpu(portal21_mesh);
+  // 90° angle + slightly higher
+  portals[0].object2world = glm::translate(glm::mat4(1), glm::vec3(0, 1, -2));
+  portals[1].object2world = glm::rotate(glm::mat4(1), -90.0f, glm::vec3(0, 1, 0))
+    * glm::translate(glm::mat4(1), glm::vec3(0, 1.2, -2));
 
-	mesh portal23_mesh = create_portal_mesh(room_height);
-	portal23_mesh.apply_translation_to_position({room2_length-1.5f+room1_length+1.0f, room_depth, 0});
-	portal23.initialize_data_on_gpu(portal23_mesh);
+  portals[0].upload();
+  portals[1].upload();
 
-	mesh portal32_mesh = create_portal_mesh(room_height);
-	portal32_mesh.apply_translation_to_position({0.5f+room1_length+room2_length+2.0f, room_depth, 0});
-	portal32.initialize_data_on_gpu(portal32_mesh);
-
-	mesh portal34_mesh = create_portal_mesh(room_height);
-	portal34_mesh.apply_translation_to_position({room3_length-1.5f+room1_length+room2_length+2.0f, room_depth, 0});
-	portal34.initialize_data_on_gpu(portal34_mesh);
-
-	mesh portal43_mesh = create_portal_mesh(room_height);
-	portal43_mesh.apply_translation_to_position({0.5f+room1_length+room2_length+room3_length+3.0f, room_depth, 0});
-	portal43.initialize_data_on_gpu(portal43_mesh);
-
-	mesh portal41_mesh = create_portal_mesh(room_height);
-	portal41_mesh.apply_translation_to_position({room4_length-1.5f+room1_length+room2_length+room3_length+3.0f, room_depth, 0});
-	portal41.initialize_data_on_gpu(portal41_mesh);
+  
 }
 
 

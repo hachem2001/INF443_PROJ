@@ -2,7 +2,9 @@
 
 #include "cgp/cgp.hpp" // Give access to the complete CGP library
 #include "environment.hpp" // The general scene environment + project variable
-#include <iostream> 
+#include <cstdlib>
+#include <iostream>
+using namespace std;
 
 
 
@@ -34,7 +36,7 @@ int main(int, char* argv[])
 {
 	std::cout << "Run " << argv[0] << std::endl;
 
-	
+	glEnable(GL_CULL_FACE);
 
 	// ************************ //
 	//     INITIALISATION

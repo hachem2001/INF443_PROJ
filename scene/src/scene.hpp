@@ -2,9 +2,16 @@
 
 
 #include "cgp/cgp.hpp"
+#include "glm/glm.hpp"
+#include "glad/glad.h"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include "environment.hpp"
 #include "room.hpp"
 #include "portal.hpp"
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#include <GLUT/glut.h>
 
 
 // This definitions allow to use the structures: mesh, mesh_drawable, etc. without mentionning explicitly cgp::
@@ -14,6 +21,7 @@ using cgp::vec3;
 using cgp::numarray;
 using cgp::timer_basic;
 
+Mesh portals[2];
 
 // The element of the GUI that are not already stored in other structures
 struct gui_parameters {
@@ -45,15 +53,6 @@ struct scene_structure : cgp::scene_inputs_generic {
 	cgp::mesh_drawable room2;
 	cgp::mesh_drawable room3;
 	cgp::mesh_drawable room4;
-
-	cgp::mesh_drawable portal12;
-	cgp::mesh_drawable portal14;
-	cgp::mesh_drawable portal21;
-	cgp::mesh_drawable portal23;
-	cgp::mesh_drawable portal32;
-	cgp::mesh_drawable portal34;
-	cgp::mesh_drawable portal43;
-	cgp::mesh_drawable portal41;
 
 	// ****************************** //
 	// Functions
