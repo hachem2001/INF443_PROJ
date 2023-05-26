@@ -42,6 +42,11 @@ namespace cgp
 
 
 		void initialize_data_on_gpu(mesh const& data, opengl_shader_structure const& shader = default_shader, opengl_texture_image_structure const& texture = default_texture);
+		
+		void initialize_data_on_gpu(Mesh const& data){
+        	initialize_data_on_gpu(mesh_primitive_quadrangle(data.vertices[0],data.vertices[1],data.vertices[2],data.vertices[3]));
+    	}
+
 		void clear();
 		void send_opengl_uniform(bool expected = true) const;
 
