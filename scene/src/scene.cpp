@@ -4,6 +4,22 @@
 
 using namespace cgp;
 
+mat4 portal_view(mat4 orig_view, Mesh* src, Mesh* dst) {
+  mat4 mv = orig_view * src->object2world;
+  mat4 portal_cam =
+    // 3. transformation from source portal to the camera - it's the
+    //    first portal's ModelView matrix:
+    mv
+    // 2. object is front-facing, the camera is facing the other way:
+    * rotate(mat4(1.0), radians(180.0f), vec3(0.0,1.0,0.0))
+    // 1. go the destination portal; using inverse, because camera
+    //    transformations are reversed compared to object
+    //    transformations:
+    * inverse(dst->object2world)
+    ;
+  return portal_cam;
+}
+
 void scene_structure::initialize()
 {
 	// Basic set-up
@@ -55,11 +71,11 @@ void scene_structure::initialize()
 	// ***************************************** //
 	// Set-up portals
 	// ***************************************** //
-	glm::vec4 portal_vertices[] = {
-    glm::vec4(-1, -1, 0, 1),
-    glm::vec4( 1, -1, 0, 1),
-    glm::vec4(-1,  1, 0, 1),
-    glm::vec4( 1,  1, 0, 1),
+	vec4 portal_vertices[] = {
+    vec4(-1, -1, 0, 1),
+    vec4( 1, -1, 0, 1),
+    vec4(-1,  1, 0, 1),
+    vec4( 1,  1, 0, 1),
   };
   for (unsigned int i = 0; i < sizeof(portal_vertices)/sizeof(portal_vertices[0]); i++) {
     portals[0].vertices.push_back(portal_vertices[i]);
@@ -75,8 +91,8 @@ void scene_structure::initialize()
   }
 
   // 90° angle + slightly higher
-  portals[0].object2world = glm::translate(glm::mat4(1), glm::vec3(0, 1, -2));
-  portals[1].object2world = glm::rotate(glm::mat4(1), -90.0f, glm::vec3(0, 1, 0))
+  portals[0].object2world = translate(mat4(1), vec3(0, 1, -2));
+  portals[1].object2world = rotate(mat4(1), -90.0f, vec3(0, 1, 0))
     * glm::translate(glm::mat4(1), glm::vec3(0, 1.2, -2));
 
   portals[0].upload();
@@ -84,6 +100,7 @@ void scene_structure::initialize()
 
   
 }
+
 
 
 void scene_structure::display_frame()
@@ -98,14 +115,6 @@ void scene_structure::display_frame()
 	draw(room2, environment);
 	draw(room3, environment);
 	draw(room4, environment);
-	draw(portal12, environment);
-	draw(portal14, environment);
-	draw(portal21, environment);
-	draw(portal23, environment);
-	draw(portal32, environment);
-	draw(portal34, environment);
-	draw(portal43, environment);
-	draw(portal41, environment);
 	
 
 	if (gui.display_wireframe){
@@ -113,14 +122,6 @@ void scene_structure::display_frame()
 		draw_wireframe(room2, environment);
 		draw_wireframe(room3, environment);
 		draw_wireframe(room4, environment);
-		draw_wireframe(portal12, environment);
-		draw_wireframe(portal14, environment);
-		draw_wireframe(portal21, environment);
-		draw_wireframe(portal23, environment);
-		draw_wireframe(portal32, environment);
-		draw_wireframe(portal34, environment);
-		draw_wireframe(portal43, environment);
-		draw_wireframe(portal41, environment);
 	}
 
 }

@@ -2,16 +2,14 @@
 
 
 #include "cgp/cgp.hpp"
-#include "glm/glm.hpp"
-#include "glad/glad.h"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
 #include "environment.hpp"
 #include "room.hpp"
 #include "portal.hpp"
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #include <GLUT/glut.h>
+#include <glm/glm.hpp>
+#include "Mesh.hpp"
 
 
 // This definitions allow to use the structures: mesh, mesh_drawable, etc. without mentionning explicitly cgp::
@@ -22,6 +20,7 @@ using cgp::numarray;
 using cgp::timer_basic;
 
 Mesh portals[2];
+mat4 portal_view(mat4 orig_view, Mesh* src, Mesh* dst) ;
 
 // The element of the GUI that are not already stored in other structures
 struct gui_parameters {
