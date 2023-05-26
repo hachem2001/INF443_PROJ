@@ -1,0 +1,6 @@
+libs/glm-master/doc
+libs/glm-master/util
+libs/glm-master/test
+libs/glm-master/cmake
+libs/glm-master/.appveyor.yml
+libs/glm-master/.travis.yml

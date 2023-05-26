@@ -3,6 +3,11 @@
 #include "room.hpp"
 #include "camera_controller_custom.hpp"
 
+#include "cgp/graphics/opengl/opengl.hpp"
+#include "libs/glm-master/glm/glm.hpp"
+
+glm::mat3 a;
+
 using namespace cgp;
 
 void scene_structure::initialize()
@@ -91,6 +96,11 @@ void scene_structure::initialize()
 	mesh portal41_mesh = create_portal_mesh(room_height);
 	portal41_mesh.apply_translation_to_position({room4_length-1.5f+room1_length+room2_length+room3_length+3.0f, room_depth, 0});
 	portal41.initialize_data_on_gpu(portal41_mesh);
+
+	portal::link_portals(portal12, portal21);
+	portal::link_portals(portal12, portal21);
+	portal::link_portals(portal12, portal21);
+	portal::link_portals(portal12, portal21);
 }
 
 

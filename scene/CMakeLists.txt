@@ -4,14 +4,25 @@ cmake_minimum_required(VERSION 3.8)
 # Relative path to the CGP library
 # => You may need to adapt this directory to your relative path in the case you move your directory
 set(PATH_TO_CGP "../cgp/library/" CACHE PATH "Relative path to CGP library location") 
+set(PATH_TO_EXTERNAL_LIBARRIES "../external_libraries/" CACHE PATH "Relative path to external libraries")
 
 # Check that the path to the library is correct
 get_filename_component(ABS_PATH_TO_CGP ${PATH_TO_CGP} ABSOLUTE)
+get_filename_component(ABS_PATH_TO_EXT ${PATH_TO_EXTERNAL_LIBARRIES} ABSOLUTE)
+
 if(NOT EXISTS ${ABS_PATH_TO_CGP})
    message(ERROR " Could not import the CGP library using the relative path ${directory_to_library} - please adjust this path in the CMakeLists.txt")
 else()
    message(STATUS "The relative path to the library is set to ${PATH_TO_CGP}")
    message(STATUS "The absolute path to the library is set to ${ABS_PATH_TO_CGP}")
+endif()
+
+
+if(NOT EXISTS ${ABS_PATH_TO_EXT})
+   message(ERROR " Could not import the External libraries using the relative path ${directory_to_library} - please adjust this path in the CMakeLists.txt")
+else()
+   message(STATUS "The relative path to the library is set to ${PATH_TO_EXTERNAL_LIBARRIES}")
+   message(STATUS "The absolute path to the library is set to ${ABS_PATH_TO_EXT}")
 endif()
 
 # Compile for Release with Debug Info
@@ -34,10 +45,12 @@ include_directories("src")
 
 # Add the lib directory
 include_directories(${ABS_PATH_TO_CGP})
+include_directories(${ABS_PATH_TO_EXT})
 
 # Include files from the CGP library (as well as external dependencies)
 message(STATUS "Include CGP lib and external dependencies files from relative path")
 include(${ABS_PATH_TO_CGP}/CMakeLists.txt)
+include(${ABS_PATH_TO_EXT}/CMakeLists.txt)
 
  
 
@@ -49,7 +62,7 @@ include(${ABS_PATH_TO_CGP}/CMakeLists.txt)
 #  @src_files: the local file for this project
 #  @src_files_cgp: all files of the cgp library
 #  @src_files_third_party: all third party libraries compiled with the project
-add_executable(${executable_name} ${src_files_cgp} ${src_files_third_party} ${src_files})
+add_executable(${executable_name} ${src_files_cgp} ${src_files_third_party} ${src_files} ${src_files_ext})
 
 
 # Set Compiler for Unix system

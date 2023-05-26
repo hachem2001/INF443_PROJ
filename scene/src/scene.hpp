@@ -57,9 +57,25 @@ struct scene_structure : cgp::scene_inputs_generic {
 	cgp::mesh_drawable portal43;
 	cgp::mesh_drawable portal41;
 
+
+	// room room1;
+	// room room2;
+	// room room3;
+	// room room4;
+
+	// portal portal12;
+	// portal portal14;
+	// portal portal21;
+	// portal portal23;
+	// portal portal32;
+	// portal portal34;
+	// portal portal43;
+	// portal portal41;
+
 	// ****************************** //
 	// Functions
 	// ****************************** //
+
 
 	void initialize();    // Standard initialization to be called before the animation loop
 	void display_frame(); // The frame display to be called within the animation loop
