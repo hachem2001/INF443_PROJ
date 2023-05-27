@@ -4,15 +4,27 @@ cmake_minimum_required(VERSION 3.8)
 # Relative path to the CGP library
 # => You may need to adapt this directory to your relative path in the case you move your directory
 set(PATH_TO_CGP "../cgp/library/" CACHE PATH "Relative path to CGP library location") 
+#set(PATH_TO_EXTERNAL_LIBARRIES "../external_libraries/" CACHE PATH "Relative path to external libraries")
 
 # Check that the path to the library is correct
 get_filename_component(ABS_PATH_TO_CGP ${PATH_TO_CGP} ABSOLUTE)
+#get_filename_component(ABS_PATH_TO_EXT ${PATH_TO_EXTERNAL_LIBARRIES} ABSOLUTE)
+
 if(NOT EXISTS ${ABS_PATH_TO_CGP})
    message(ERROR " Could not import the CGP library using the relative path ${directory_to_library} - please adjust this path in the CMakeLists.txt")
 else()
    message(STATUS "The relative path to the library is set to ${PATH_TO_CGP}")
    message(STATUS "The absolute path to the library is set to ${ABS_PATH_TO_CGP}")
 endif()
+
+
+# if(NOT EXISTS ${ABS_PATH_TO_EXT})
+#    message(ERROR " Could not import the External libraries using the relative path ${directory_to_library} - please adjust this path in the CMakeLists.txt")
+# else()
+#    message(STATUS "The relative path to the library is set to ${PATH_TO_EXTERNAL_LIBARRIES}")
+#    message(STATUS "The absolute path to the library is set to ${ABS_PATH_TO_EXT}")
+# endif()
+
 
 # Compile for Release with Debug Info
 #set(CMAKE_BUILD_TYPE RelWithDebInfo) 
@@ -29,15 +41,28 @@ get_filename_component(executable_name ${CMAKE_CURRENT_LIST_DIR} NAME)
 message(STATUS "Configure steps to build executable file [${executable_name}]")
 project(${executable_name})
 
+#### USER HEAVY ADDITIONS HERE ####
+# Including glm, and others
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+message(STATUS "[HACHEM] Modules path set to ${CMAKE_MODULE_PATH}")
+
+find_package(GLM REQUIRED)
+message(STATUS "GLM included at ${GLM_INCLUDE_DIR}")
+include_directories("include")
+#### END USER HEAVY ADDITIONS HERE ####
+
+
 # Add current src/ directory
 include_directories("src")
 
 # Add the lib directory
 include_directories(${ABS_PATH_TO_CGP})
+#include_directories(${ABS_PATH_TO_EXT})
 
 # Include files from the CGP library (as well as external dependencies)
 message(STATUS "Include CGP lib and external dependencies files from relative path")
 include(${ABS_PATH_TO_CGP}/CMakeLists.txt)
+#include(${ABS_PATH_TO_EXT}/CMakeLists.txt)
 
  
 
@@ -49,7 +74,7 @@ include(${ABS_PATH_TO_CGP}/CMakeLists.txt)
 #  @src_files: the local file for this project
 #  @src_files_cgp: all files of the cgp library
 #  @src_files_third_party: all third party libraries compiled with the project
-add_executable(${executable_name} ${src_files_cgp} ${src_files_third_party} ${src_files})
+add_executable(${executable_name} ${src_files_cgp} ${src_files_third_party} ${src_files} )
 
 
 # Set Compiler for Unix system
@@ -77,8 +102,6 @@ if(MSVC)
     add_definitions(/MP /wd4244 /wd4127 /wd4267 /wd4706 /wd4458 /wd4996 /wd26495 /openmp)   # Parallel build (/MP) + disable some warnings
     source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${src_files})  #Allow to explore source directories as a tree in Visual Studio
 endif()
-
-
 
 # Link options for Unix
 target_link_libraries(${executable_name} ${GLFW_LIBRARIES})
