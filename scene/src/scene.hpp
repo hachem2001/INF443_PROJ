@@ -43,6 +43,9 @@ struct scene_structure : cgp::scene_inputs_generic {
 	// Elements and shapes of the scene
 	// ****************************** //
 
+	//room rooms[4];
+	//portal portals[8];
+
 	cgp::mesh_drawable room1;
 	cgp::mesh_drawable room2;
 	cgp::mesh_drawable room3;

@@ -4,7 +4,7 @@
 #include "camera_controller_custom.hpp"
 
 #include "cgp/graphics/opengl/opengl.hpp"
-#include "libs/glm-master/glm/glm.hpp"
+#include <glm/glm.hpp>
 
 using namespace cgp;
 
@@ -22,9 +22,9 @@ void scene_structure::initialize()
 	// ***************************************** //
 
 	float room1_length = 5.0f; //more than 4.0f
-	float room2_length = 10.0f; //more than 4.0f
-	float room3_length = 4.0f; //more than 4.0f
-	float room4_length = 8.0f; //more than 4.0f
+	float room2_length = 10.0f; // more than 4.0f
+	float room3_length = 4.0f; // more than 4.0f
+	float room4_length = 8.0f; // more than 4.0f
 	float room_depth = 2.0f;
 	float room_height = 2.0f;
 
@@ -95,10 +95,10 @@ void scene_structure::initialize()
 	portal41_mesh.apply_translation_to_position({room4_length-1.5f+room1_length+room2_length+room3_length+3.0f, room_depth, 0});
 	portal41.initialize_data_on_gpu(portal41_mesh);
 
+	/*portal::link_portals(portal12, portal21);
 	portal::link_portals(portal12, portal21);
 	portal::link_portals(portal12, portal21);
-	portal::link_portals(portal12, portal21);
-	portal::link_portals(portal12, portal21);
+	portal::link_portals(portal12, portal21);*/
 }
 
 
