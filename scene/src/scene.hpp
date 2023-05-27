@@ -44,6 +44,12 @@ struct scene_structure : cgp::scene_inputs_generic {
 	cgp::mesh_drawable room3;
 	cgp::mesh_drawable room4;
 
+	// Timer used for the animation
+	timer_basic timer;
+
+	// The entire hierarchy
+	cgp::hierarchy_mesh_drawable hierarchy;
+
 	// ****************************** //
 	// Functions
 	// ****************************** //
