@@ -3,6 +3,7 @@
 
 #include "cgp/cgp.hpp"
 #include "environment.hpp"
+#include "camera_controller_custom.hpp"
 
 #include <iostream> 
 #include <vector>
@@ -32,7 +33,7 @@ struct scene_structure : cgp::scene_inputs_generic {
 	// Elements and shapes of the scene
 	// ****************************** //
 
-	camera_controller_orbit_euler camera_control;
+	camera_controller_custom camera_control;
 	camera_projection_perspective camera_projection;
 	window_structure window;
 
@@ -56,6 +57,7 @@ struct scene_structure : cgp::scene_inputs_generic {
 	// The entire hierarchy
 	cgp::hierarchy_mesh_drawable hierarchy;
 
+	int N_trees = 100;
 	cgp::mesh_drawable terrain;
 	cgp::mesh_drawable tree;
 	cgp::mesh_drawable pinetree;

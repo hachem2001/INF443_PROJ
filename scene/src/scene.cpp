@@ -14,7 +14,7 @@ void scene_structure::initialize()
 	// ********************************** //
 	camera_control.initialize(inputs, window); // Give access to the inputs and window global state to the camera controler
 	camera_control.set_rotation_axis_z();
-	camera_control.look_at({15.0f, 6.0f, 6.0f}, {0, 0, 0});
+	camera_control.camera_model.look_at({10,6,6}, {0,0,0});
 	global_frame.initialize_data_on_gpu(mesh_primitive_frame());
 
 	float room_length = 5.0f;
@@ -95,7 +95,7 @@ void scene_structure::initialize()
 	// ********************************** //
 
 	int N_terrain_samples = 100;
-	float terrain_length = 20;
+	float terrain_length = 100;
 	mesh const terrain_mesh = create_terrain_mesh(N_terrain_samples, terrain_length);
 	terrain.initialize_data_on_gpu(terrain_mesh);
 	terrain.material.color = {0.6f, 0.85f, 0.5f};
@@ -104,7 +104,7 @@ void scene_structure::initialize()
 
 	mesh const tree_mesh = create_tree_foliage();
 	tree.initialize_data_on_gpu(tree_mesh);
-	tree.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture_foliage3.png", GL_REPEAT, GL_REPEAT);
+	tree.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture_foliage3.jpeg", GL_REPEAT, GL_REPEAT);
 
 	mesh const trunk_mesh = create_treetrunk();
 	trunk.initialize_data_on_gpu(trunk_mesh);
@@ -116,10 +116,10 @@ void scene_structure::initialize()
 	violetflower.initialize_data_on_gpu(violetflower_mesh);
 	mesh const orangeflower_mesh = create_orangeflower();
 	orangeflower.initialize_data_on_gpu(orangeflower_mesh);
-	tree_position = generate_positions_on_terrain(20, terrain_length);
-	pinetree_position = generate_positions_on_terrain(20, terrain_length);
-	violetflower_position = generate_positions_on_terrain(40, terrain_length);
-	orangeflower_position = generate_positions_on_terrain(40, terrain_length);
+	tree_position = generate_positions_on_terrain(N_trees, terrain_length);
+	pinetree_position = generate_positions_on_terrain(N_trees, terrain_length);
+	violetflower_position = generate_positions_on_terrain(2*N_trees, terrain_length);
+	orangeflower_position = generate_positions_on_terrain(2*N_trees, terrain_length);
 
 	// ********************************** //
 	//             Monkey face            //
@@ -156,7 +156,7 @@ void scene_structure::display_frame()
 	
 	draw(terrain, environment);
 
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < N_trees; i++)
 	{
 		tree.model.translation = tree_position[i];
 		trunk.model.translation = tree_position[i];

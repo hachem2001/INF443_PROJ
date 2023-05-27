@@ -91,17 +91,17 @@ void camera_controller_custom::idle_frame(mat4& camera_matrix_view)
 	// with arrows:
 	if (inputs->keyboard.ctrl == false) {
 		if (inputs->keyboard.up)
-			camera_model.manipulator_translate_in_plane({ 0,-magnitude });
-			camera_model.position_camera[2]+=evaluate_terrain_height(camera_model.position_camera[0],camera_model.position_camera[1]);
+			camera_model.manipulator_translate_in_plane({ 0,-2*magnitude });
+			camera_model.position_camera[2]=evaluate_terrain_height(camera_model.position_camera[0],camera_model.position_camera[1])+1.5f;
 		if (inputs->keyboard.down)
-			camera_model.manipulator_translate_in_plane({ 0, magnitude });
-			camera_model.position_camera[2]+=evaluate_terrain_height(camera_model.position_camera[0],camera_model.position_camera[1]);
+			camera_model.manipulator_translate_in_plane({ 0, 2*magnitude });
+			camera_model.position_camera[2]=evaluate_terrain_height(camera_model.position_camera[0],camera_model.position_camera[1])+1.5f;
 		if (inputs->keyboard.left)
-			camera_model.manipulator_translate_in_plane({ magnitude ,0 });
-			camera_model.position_camera[2]+=evaluate_terrain_height(camera_model.position_camera[0],camera_model.position_camera[1]);
+			camera_model.manipulator_translate_in_plane({ 2*magnitude ,0 });
+			camera_model.position_camera[2]=evaluate_terrain_height(camera_model.position_camera[0],camera_model.position_camera[1])+1.5f;
 		if (inputs->keyboard.right)
-			camera_model.manipulator_translate_in_plane({ -magnitude ,0 });
-			camera_model.position_camera[2]+=evaluate_terrain_height(camera_model.position_camera[0],camera_model.position_camera[1]);
+			camera_model.manipulator_translate_in_plane({ -2*magnitude ,0 });
+			camera_model.position_camera[2]=evaluate_terrain_height(camera_model.position_camera[0],camera_model.position_camera[1])+1.5f;
 	}
 	else {
 		if (inputs->keyboard.up)
