@@ -76,7 +76,7 @@ mesh create_treetrunk()
     float r = 0.3f; // trunk radius
 
     // Create a brown trunk
-    mesh trunk = mesh_primitive_cylinder(r, {0,0,0}, {0,0,h});
+    mesh trunk = mesh_primitive_cylinder(r, {0, 0, 0}, {0, 0, h});
     trunk.color.fill({0.4f, 0.3f, 0.3f});
 
     return trunk;
@@ -97,13 +97,13 @@ mesh create_tree_foliage()
 
 mesh create_violetflower()
 {
-    float h = 0.4f; // trunk height
+    float h = 0.4f;  // trunk height
     float r = 0.05f; // trunk radius
 
     mesh trunk = create_cylinder_mesh(r, h);
     trunk.color.fill({0.5f, 0.7f, 0.4f});
-    
-    mesh foliage = mesh_primitive_ellipsoid({r*3, r*3, h/3}, {0, 0, 0});
+
+    mesh foliage = mesh_primitive_ellipsoid({r * 3, r * 3, h / 3}, {0, 0, 0});
     foliage.apply_translation_to_position({0, 0, h});
     foliage.color.fill({0.8f, 0.0f, 0.5f});
 
@@ -115,18 +115,27 @@ mesh create_violetflower()
 
 mesh create_orangeflower()
 {
-    float h = 0.4f; // trunk height
-    float r = 0.05f; // trunk radius
+    float h = 0.3f;  // trunk height
+    float r = 0.02f; // trunk radius
 
-    mesh trunk = create_cylinder_mesh(r, h);
+    mesh trunk = create_cylinder_mesh(0.7f*r, h);
     trunk.color.fill({0.4f, 0.6f, 0.3f});
-    
-    mesh foliage = mesh_primitive_ellipsoid({r*3, r*3, h/3}, {0, 0, 0});
-    foliage.apply_translation_to_position({0, 0, h});
-    foliage.color.fill({0.8f, 0.5f, 0.0f});
 
     mesh flower = trunk;
+
+    mesh foliage = mesh_primitive_sphere(r * 1.5f);
+    foliage.apply_translation_to_position({0, 0, h});
+    foliage.color.fill({0.8f, 0.5f, 0.0f});
     flower.push_back(foliage);
+    foliage = mesh_primitive_ellipsoid({4 * r, r / 2, 0.5 * r});
+    foliage.color.fill({1, 1, 1});
+    foliage.apply_translation_to_position({1.9f*r, 0, 0.95*h});
+    for (int i = 0; i < 15; i++)
+    {
+        foliage.apply_rotation_to_position({0, 0, 1}, 2 * 3.14f / 15);
+        flower.push_back(foliage);
+    }
+    
 
     return flower;
 }

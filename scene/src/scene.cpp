@@ -63,26 +63,27 @@ void scene_structure::initialize()
 	right_eye.initialize_data_on_gpu(mesh_primitive_sphere(0.01f));
 	nose.initialize_data_on_gpu(mesh_primitive_triangle({0.0f, -0.01f, 0.005f}, {0.0f, 0.01f, 0.005f}, {0.0f, 0.0f, -0.01f}));
 
-	vec3 beige = {249.0f / 255, 217.0f / 255, 163.0f / 255};
+	vec3 white = {1, 1, 1};
 	vec3 black = {0, 0, 0};
-	body.material.color = beige;
-	head.material.color = beige;
-	left_foot.material.color = beige;
-	right_foot.material.color = beige;
-	left_arm.material.color = beige;
-	right_arm.material.color = beige;
-	left_ear.material.color = beige;
-	right_ear.material.color = beige;
+	vec3 red = {0.95f, 0.2f, 0.2f};
+	body.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/Rabbit.png", GL_REPEAT, GL_REPEAT);
+	head.material.color = white;
+	left_foot.material.color = white;
+	right_foot.material.color = white;
+	left_arm.material.color = white;
+	right_arm.material.color = white;
+	left_ear.material.color = white;
+	right_ear.material.color = white;
 	left_eye.material.color = black;
 	right_eye.material.color = black;
-	nose.material.color = black;
+	nose.material.color = red;
 
 	hierarchy.add(body, "body");
 	hierarchy.add(head, "head", "body", {0.0f, 0.0f, 0.26f});
 	hierarchy.add(left_foot, "left foot", "body", {0.05f, 0.05f, 0.0f});
 	hierarchy.add(right_foot, "right foot", "body", {0.05f, -0.05f, 0.0f});
-	hierarchy.add(left_arm, "left arm", "body", {0.09f, 0.05f, 0.11f});
-	hierarchy.add(right_arm, "right arm", "body", {0.09f, -0.05f, 0.11f});
+	hierarchy.add(left_arm, "left arm", "body", {0.09f, 0.05f, 0.13f});
+	hierarchy.add(right_arm, "right arm", "body", {0.09f, -0.05f, 0.13f});
 	hierarchy.add(left_ear, "left ear", "head", {0.0f, 0.035f, 0.1f});
 	hierarchy.add(right_ear, "right ear", "head", {0.0f, -0.035f, 0.1f});
 	hierarchy.add(left_eye, "left eye", "head", {0.055f, 0.035f, 0.04f});
@@ -120,12 +121,14 @@ void scene_structure::initialize()
 	violetflower_position = generate_positions_on_terrain(40, terrain_length);
 	orangeflower_position = generate_positions_on_terrain(40, terrain_length);
 
-	std::vector<glm::vec4> suzanne_vertices;
-	std::vector<glm::vec3> suzanne_normals;
-	std::vector<GLushort> suzanne_elements;
-	load_obj("suzanne.obj", suzanne_vertices, suzanne_normals, suzanne_elements);
+	// ********************************** //
+	//             Monkey face            //
+	// ********************************** //
 
-
+	mesh suzanne_mesh = mesh_load_file_obj("assets/suzanne.obj");
+	suzanne_mesh.apply_scaling_to_position(0.3f);
+	monkey.initialize_data_on_gpu(suzanne_mesh);
+	monkey.material.color = {0.68f, 0.55f, 0.34f};
 }
 
 void scene_structure::display_frame()
@@ -148,9 +151,9 @@ void scene_structure::display_frame()
 
 	hierarchy.update_local_to_global_coordinates();
 
-	// Draw the hierarchy as a single mesh
 	draw(hierarchy, environment);
-
+	//draw(monkey, environment);
+	
 	draw(terrain, environment);
 
 	for (int i = 0; i < 20; i++)

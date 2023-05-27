@@ -4,7 +4,6 @@
 #include "cgp/cgp.hpp"
 #include "environment.hpp"
 
-#include <glm/glm.hpp>
 #include <iostream> 
 #include <vector>
 
@@ -69,6 +68,8 @@ struct scene_structure : cgp::scene_inputs_generic {
 	std::vector<cgp::vec3> violetflower_position;
 	std::vector<cgp::vec3> orangeflower_position;
 	std::vector<cgp::vec3> mushroom_position;
+
+	cgp::mesh_drawable monkey;
 
 	// ****************************** //
 	// Functions
