@@ -3,6 +3,7 @@
 #include "room.hpp"
 #include "terrain.hpp"
 #include "nature.hpp"
+#include "monkey.hpp"
 
 using namespace cgp;
 
@@ -118,6 +119,13 @@ void scene_structure::initialize()
 	pinetree_position = generate_positions_on_terrain(20, terrain_length);
 	violetflower_position = generate_positions_on_terrain(40, terrain_length);
 	orangeflower_position = generate_positions_on_terrain(40, terrain_length);
+
+	std::vector<glm::vec4> suzanne_vertices;
+	std::vector<glm::vec3> suzanne_normals;
+	std::vector<GLushort> suzanne_elements;
+	load_obj("suzanne.obj", suzanne_vertices, suzanne_normals, suzanne_elements);
+
+
 }
 
 void scene_structure::display_frame()
