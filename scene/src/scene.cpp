@@ -1,13 +1,16 @@
 #include "scene.hpp"
 
 #include "room.hpp"
+#include "terrain.hpp"
+#include "nature.hpp"
 
 using namespace cgp;
 
 void scene_structure::initialize()
 {
-	// Basic set-up
-	// ***************************************** //
+	// ********************************** //
+	//            Basic setup             //
+	// ********************************** //
 	camera_control.initialize(inputs, window); // Give access to the inputs and window global state to the camera controler
 	camera_control.set_rotation_axis_z();
 	camera_control.look_at({15.0f, 6.0f, 6.0f}, {0, 0, 0});
@@ -57,9 +60,9 @@ void scene_structure::initialize()
 	right_ear.initialize_data_on_gpu(mesh_primitive_ellipsoid({0.02f, 0.015f, 0.07f}, {0, 0, 0}));
 	left_eye.initialize_data_on_gpu(mesh_primitive_sphere(0.01f));
 	right_eye.initialize_data_on_gpu(mesh_primitive_sphere(0.01f));
-	nose.initialize_data_on_gpu(mesh_primitive_triangle({0.0f, -0.01f, 0.005f},{0.0f, 0.01f, 0.005f},{0.0f, 0.0f, -0.01f}));
+	nose.initialize_data_on_gpu(mesh_primitive_triangle({0.0f, -0.01f, 0.005f}, {0.0f, 0.01f, 0.005f}, {0.0f, 0.0f, -0.01f}));
 
-	vec3 beige = {249.0f/255, 217.0f/255, 163.0f/255};
+	vec3 beige = {249.0f / 255, 217.0f / 255, 163.0f / 255};
 	vec3 black = {0, 0, 0};
 	body.material.color = beige;
 	head.material.color = beige;
@@ -74,16 +77,47 @@ void scene_structure::initialize()
 	nose.material.color = black;
 
 	hierarchy.add(body, "body");
-	hierarchy.add(head, "head", "body", {0.0f,0.0f,0.26f});
-	hierarchy.add(left_foot, "left foot", "body", {0.05f,0.05f,0.0f});
-	hierarchy.add(right_foot, "right foot", "body", {0.05f,-0.05f,0.0f});
-	hierarchy.add(left_arm, "left arm", "body", {0.09f,0.05f,0.11f});
-	hierarchy.add(right_arm, "right arm", "body", {0.09f,-0.05f,0.11f});
-	hierarchy.add(left_ear, "left ear", "head", {0.0f,0.035f,0.1f});
-	hierarchy.add(right_ear, "right ear", "head", {0.0f,-0.035f,0.1f});
-	hierarchy.add(left_eye, "left eye", "head", {0.055f,0.035f,0.04f});
-	hierarchy.add(right_eye, "right eye", "head", {0.055f,-0.035f,0.04f});
-	hierarchy.add(nose, "nose", "head", {0.076f,0,0.028f});
+	hierarchy.add(head, "head", "body", {0.0f, 0.0f, 0.26f});
+	hierarchy.add(left_foot, "left foot", "body", {0.05f, 0.05f, 0.0f});
+	hierarchy.add(right_foot, "right foot", "body", {0.05f, -0.05f, 0.0f});
+	hierarchy.add(left_arm, "left arm", "body", {0.09f, 0.05f, 0.11f});
+	hierarchy.add(right_arm, "right arm", "body", {0.09f, -0.05f, 0.11f});
+	hierarchy.add(left_ear, "left ear", "head", {0.0f, 0.035f, 0.1f});
+	hierarchy.add(right_ear, "right ear", "head", {0.0f, -0.035f, 0.1f});
+	hierarchy.add(left_eye, "left eye", "head", {0.055f, 0.035f, 0.04f});
+	hierarchy.add(right_eye, "right eye", "head", {0.055f, -0.035f, 0.04f});
+	hierarchy.add(nose, "nose", "head", {0.076f, 0, 0.028f});
+
+	// ********************************** //
+	//            Forest scene            //
+	// ********************************** //
+
+	int N_terrain_samples = 100;
+	float terrain_length = 20;
+	mesh const terrain_mesh = create_terrain_mesh(N_terrain_samples, terrain_length);
+	terrain.initialize_data_on_gpu(terrain_mesh);
+	terrain.material.color = {0.6f, 0.85f, 0.5f};
+	terrain.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture_grass.jpg", GL_REPEAT, GL_REPEAT);
+	terrain.material.phong.specular = 0.0f; // non-specular terrain material
+
+	mesh const tree_mesh = create_tree_foliage();
+	tree.initialize_data_on_gpu(tree_mesh);
+	tree.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture_foliage3.png", GL_REPEAT, GL_REPEAT);
+
+	mesh const trunk_mesh = create_treetrunk();
+	trunk.initialize_data_on_gpu(trunk_mesh);
+	trunk.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/trunk.jpg", GL_REPEAT, GL_REPEAT);
+
+	mesh const pinetree_mesh = create_pinetree_foliage();
+	pinetree.initialize_data_on_gpu(pinetree_mesh);
+	mesh const violetflower_mesh = create_violetflower();
+	violetflower.initialize_data_on_gpu(violetflower_mesh);
+	mesh const orangeflower_mesh = create_orangeflower();
+	orangeflower.initialize_data_on_gpu(orangeflower_mesh);
+	tree_position = generate_positions_on_terrain(20, terrain_length);
+	pinetree_position = generate_positions_on_terrain(20, terrain_length);
+	violetflower_position = generate_positions_on_terrain(40, terrain_length);
+	orangeflower_position = generate_positions_on_terrain(40, terrain_length);
 }
 
 void scene_structure::display_frame()
@@ -103,12 +137,33 @@ void scene_structure::display_frame()
 	rotation_transform r_head = rotation_transform::from_axis_angle({0, 1, 0}, Pi / 6);
 	rotation_transform r_head_anim = rotation_transform::from_axis_angle({0, 1, 0}, 0.25f * cos(2 * timer.t));
 	hierarchy["head"].transform_local.rotation = r_head * r_head_anim;
-	
+
 	hierarchy.update_local_to_global_coordinates();
 
 	// Draw the hierarchy as a single mesh
 	draw(hierarchy, environment);
-	
+
+	draw(terrain, environment);
+
+	for (int i = 0; i < 20; i++)
+	{
+		tree.model.translation = tree_position[i];
+		trunk.model.translation = tree_position[i];
+		draw(tree, environment);
+		draw(trunk, environment);
+		pinetree.model.translation = pinetree_position[i];
+		trunk.model.translation = pinetree_position[i];
+		draw(pinetree, environment);
+		draw(trunk, environment);
+		violetflower.model.translation = violetflower_position[2 * i];
+		orangeflower.model.translation = orangeflower_position[2 * i];
+		draw(violetflower, environment);
+		draw(orangeflower, environment);
+		violetflower.model.translation = violetflower_position[2 * i + 1];
+		orangeflower.model.translation = orangeflower_position[2 * i + 1];
+		draw(violetflower, environment);
+		draw(orangeflower, environment);
+	}
 
 	if (gui.display_wireframe)
 	{
