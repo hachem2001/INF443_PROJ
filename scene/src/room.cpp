@@ -29,7 +29,7 @@ mesh create_room_mesh(float room_length, float room_depth, float room_height) {
     return m;
 }
 
-room::room(float room_length, float room_depth, float room_height, vec3 position) : first_portal(room_height, vec3{ 0.5f, room_depth, 0 } + position), second_portal(room_height, vec3{ room_length - 1.5f, room_depth, 0 } + position) {
+room::room(float room_length, float room_depth, float room_height, vec3 position) : first_portal(room_height, vec3{ 0.5f, room_depth, 0 } + position) , second_portal (room_height, vec3{ room_length - 1.5f, room_depth, 0 } + position) {
 
     // Wall shapes
     mesh sol = mesh_primitive_quadrangle({ 0,0.0f,0.0f }, { room_length,0.0f,0.0f }, { room_length,room_depth,0 }, { 0,room_depth,0.0f });

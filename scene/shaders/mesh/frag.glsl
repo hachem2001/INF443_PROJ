@@ -30,7 +30,7 @@ layout(location=0) out vec4 FragColor;
 
 uniform sampler2D image_texture;   // Texture image identifiant
 
-uniform mat4 view;       // View matrix (rigid transform) of the camera - to compute the camera position
+uniform mat4 view;  // View matrix (rigid transform) of the camera - to compute the camera position
 
 uniform vec3 light; // position of the light
 

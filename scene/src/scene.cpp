@@ -4,7 +4,7 @@
 #include "camera_controller_custom.hpp"
 
 #include "cgp/graphics/opengl/opengl.hpp"
-#include <glm/glm.hpp>
+//#include <glm/glm.hpp>
 
 using namespace cgp;
 
@@ -28,22 +28,22 @@ void scene_structure::initialize()
 	float room_depth = 2.0f;
 	float room_height = 2.0f;
 
+
+	player.initialize_data_on_gpu(mesh_primitive_tetrahedron());
+	player.model.translation = camera_control.camera_model.position();
 	// room 1
-	mesh room1_mesh = create_room_mesh(room1_length, room_depth, room_height);
-	room1_mesh.apply_translation_to_position({0, 0, 0});
-	room1.initialize_data_on_gpu(room1_mesh);
-	
-	room1.material.color = { 0.6f,0.85f,0.5f };
-	room1.material.phong.specular = 0.0f; // non-specular terrain material
+	room1 = new room(room1_length, room_depth, room_height, {0,0,0});
+
+	room1->room_mesh_drawable.material.color = { 0.6f,0.85f,0.5f };
+	room1->room_mesh_drawable.material.phong.specular = 0.0f;
 
 	//room 2
-	mesh room2_mesh = create_room_mesh(room2_length, room_depth, room_height);
-	room2_mesh.apply_translation_to_position({room1_length+1.0f, 0, 0});
-	room2.initialize_data_on_gpu(room2_mesh);
-	
-	room2.material.color = { 0.5f,0.5f,0.7f };
-	room2.material.phong.specular = 0.0f; // non-specular terrain material
+	room2 = new room(room2_length, room_depth, room_height, {room1_length+1.0f, 0, room_height+1.0f});
 
+	room2->room_mesh_drawable.material.color = { 0.5f,0.5f,0.7f };
+	room2->room_mesh_drawable.material.phong.specular = 0.0f;
+
+	/*
 	// room 3
 	mesh room3_mesh = create_room_mesh(room3_length, room_depth, room_height);
 	room3_mesh.apply_translation_to_position({room1_length+room2_length+2.0f, 0, 0});
@@ -59,10 +59,13 @@ void scene_structure::initialize()
 	
 	room4.material.color = { 0.5f,0.5f,0.5f };
 	room4.material.phong.specular = 0.0f; // non-specular terrain material
+	*/
 
 	// ***************************************** //
 	// Set-up portals
 	// ***************************************** //
+
+	/*
 	mesh portal14_mesh = create_portal_mesh(room_height);
 	portal14_mesh.apply_translation_to_position({0.5f, room_depth, 0});
 	portal14.initialize_data_on_gpu(portal14_mesh);
@@ -94,22 +97,30 @@ void scene_structure::initialize()
 	mesh portal41_mesh = create_portal_mesh(room_height);
 	portal41_mesh.apply_translation_to_position({room4_length-1.5f+room1_length+room2_length+room3_length+3.0f, room_depth, 0});
 	portal41.initialize_data_on_gpu(portal41_mesh);
+	*/
 
-	/*portal::link_portals(portal12, portal21);
-	portal::link_portals(portal12, portal21);
-	portal::link_portals(portal12, portal21);
-	portal::link_portals(portal12, portal21);*/
+	// portal12 = room1->get_portal_1();
+	// portal21 = room1->get_portal_2();
+	// portal21 = room2->get_portal_1();
+	// portal23 = room2->get_portal_2();
+
+	room1->get_portal_1()->link_portals(*room2->get_portal_1());
 }
 
 
 void scene_structure::display_frame()
 {
 	// Set the light to the current position of the camera
+	// Set the recursion counts to every portal to 2.
+
+	player.model.translation = camera_control.camera_model.position();
 	environment.light = camera_control.camera_model.position();
 	
 	if (gui.display_frame)
 		draw(global_frame, environment);
 
+
+	/*
 	draw(room1, environment);
 	draw(room2, environment);
 	draw(room3, environment);
@@ -122,9 +133,32 @@ void scene_structure::display_frame()
 	draw(portal34, environment);
 	draw(portal43, environment);
 	draw(portal41, environment);
-	
+	*/
+	//draw(room1->room_mesh_drawable, environment);
+	room1->draw(environment);
+	room2->draw(environment);
+	//draw(player, environment);
+
+	mat4 camera_projection_m = camera_projection.matrix();
+
+	room1->first_portal.draw_begin(camera_control.camera_model, camera_projection_m, environment);
+	display_frame_from_portal(room1->first_portal);
+	room1->first_portal.draw_end(camera_control.camera_model,camera_projection_m, environment);
+
+	room1->second_portal.draw_begin(camera_control.camera_model,camera_projection_m, environment);
+	display_frame_from_portal(room1->first_portal);
+	room1->second_portal.draw_end(camera_control.camera_model,camera_projection_m, environment);
+
+	room2->first_portal.draw_begin(camera_control.camera_model,camera_projection_m, environment);
+	display_frame_from_portal(room1->first_portal);
+	room2->first_portal.draw_end(camera_control.camera_model,camera_projection_m, environment);
+
+	room2->second_portal.draw_begin(camera_control.camera_model,camera_projection_m, environment);
+	display_frame_from_portal(room1->first_portal);
+	room2->second_portal.draw_end(camera_control.camera_model,camera_projection_m, environment);
 
 	if (gui.display_wireframe){
+		/*
 		draw_wireframe(room1, environment);
 		draw_wireframe(room2, environment);
 		draw_wireframe(room3, environment);
@@ -137,8 +171,25 @@ void scene_structure::display_frame()
 		draw_wireframe(portal34, environment);
 		draw_wireframe(portal43, environment);
 		draw_wireframe(portal41, environment);
+		*/
+
 	}
 
+}
+
+void scene_structure::display_frame_from_portal(portal& portal)
+{
+	// This function is supposed to do basically the same thing as what is shown before, except it doesn't bother showing anything
+	// that is outside the view of the portal. Well, I didn't bother tbh...
+	
+
+	// POUR LINSTANT : RIEN DE RECURSIF. Chuis pas assez fort pour ça.
+	if (portal.linked) {
+		room1->draw(environment);
+		room2->draw(environment);
+		//draw(player, environment);
+	}
+	//display_frame();
 }
 
 void scene_structure::display_gui()

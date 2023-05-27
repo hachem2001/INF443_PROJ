@@ -186,7 +186,7 @@ namespace cgp
 
 		// Prepare for draw call
 		// ********************************** //
-		glBindVertexArray(drawable.vao);                                     opengl_check;
+		glBindVertexArray(drawable.vao); opengl_check;
 
 
 		// Draw call

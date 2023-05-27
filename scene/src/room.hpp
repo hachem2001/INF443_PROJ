@@ -7,7 +7,7 @@
 #include "cgp/graphics/opengl/opengl.hpp"
 
 class room {
-private:
+public:
     int nb; // An identifying index to the room.
 
     cgp::mesh room_mesh; // The mesh corresponding to room (in "CPU memory" basically)
@@ -16,7 +16,7 @@ private:
     portal first_portal;
     portal second_portal;
 
-public:
+//public:
     /// @brief Initializes room.
     /// @param room_length Room's length
     /// @param room_depth Room's depth
