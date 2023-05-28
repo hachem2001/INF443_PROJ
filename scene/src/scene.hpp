@@ -57,17 +57,19 @@ struct scene_structure : cgp::scene_inputs_generic {
 	// The entire hierarchy
 	cgp::hierarchy_mesh_drawable hierarchy;
 
-	int N_trees = 100;
+	int N_trees = 20;
 	cgp::mesh_drawable terrain;
 	cgp::mesh_drawable tree;
 	cgp::mesh_drawable pinetree;
 	cgp::mesh_drawable trunk;
-	cgp::mesh_drawable violetflower;
+	cgp::mesh_drawable rose;
+	cgp::mesh_drawable tige;
 	cgp::mesh_drawable orangeflower;
 	cgp::mesh_drawable mushroom;
+	cgp::mesh_drawable mushroom_tige;
 	std::vector<cgp::vec3> tree_position;
 	std::vector<cgp::vec3> pinetree_position;
-	std::vector<cgp::vec3> violetflower_position;
+	std::vector<cgp::vec3> rose_position;
 	std::vector<cgp::vec3> orangeflower_position;
 	std::vector<cgp::vec3> mushroom_position;
 

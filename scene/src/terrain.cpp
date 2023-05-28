@@ -8,7 +8,7 @@ using namespace cgp;
 float evaluate_terrain_height(float x, float y)
 {
     vec2 p_i[4] = { {-10,-10}, {5,5}, {-3,4}, {6,4} };
-    float h_i[4] = {3.0f, -1.5f, 1.0f, 2.0f};
+    float h_i[4] = {4.0f, -2.0f, 2.0f, 3.0f};
     float sigma_i[4] = {10.0f,3.0f,4.0f,4.0f};
 
     float z = 0;

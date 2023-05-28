@@ -57,14 +57,14 @@ mesh create_cone_mesh(float radius, float height, float z_offset)
 
 mesh create_pinetree_foliage()
 {
-    float h = 2.0f; // trunk height
+    float h = 2.5f; // trunk height
     float r = 0.3f; // trunk radius
 
     // Create a green foliage from 3 cones
     mesh foliage = create_cone_mesh(4 * r, 6 * r, 0.0f);      // base-cone
     foliage.push_back(create_cone_mesh(4 * r, 6 * r, 2 * r)); // middle-cone
     foliage.push_back(create_cone_mesh(4 * r, 6 * r, 4 * r)); // top-cone
-    foliage.apply_translation_to_position({0, 0, h});         // place foliage at the top of the trunk
+    foliage.apply_translation_to_position({0, 0, 0.9*h});         // place foliage at the top of the trunk
     foliage.color.fill({0.4f, 0.6f, 0.3f});
 
     return foliage;
@@ -72,11 +72,12 @@ mesh create_pinetree_foliage()
 
 mesh create_treetrunk()
 {
-    float h = 2.0f; // trunk height
+    float h = 2.5f; // trunk height
     float r = 0.3f; // trunk radius
 
     // Create a brown trunk
     mesh trunk = mesh_primitive_cylinder(r, {0, 0, 0}, {0, 0, h});
+    trunk.apply_translation_to_position({0, 0, -0.1*h});
     trunk.color.fill({0.4f, 0.3f, 0.3f});
 
     return trunk;
@@ -84,41 +85,24 @@ mesh create_treetrunk()
 
 mesh create_tree_foliage()
 {
-    float h = 2.0f; // trunk height
+    float h = 2.5f; // trunk height
     float r = 0.3f; // trunk radius
 
     // Create a green foliage from a sphere
     mesh foliage = mesh_primitive_sphere(4 * r);
-    foliage.apply_translation_to_position({0, 0, h}); // place foliage at the top of the trunk
+    foliage.apply_translation_to_position({0, 0, 1.1*h}); // place foliage at the top of the trunk
     foliage.color.fill({0.4f, 0.6f, 0.3f});
 
     return foliage;
 }
 
-mesh create_violetflower()
-{
-    float h = 0.4f;  // trunk height
-    float r = 0.05f; // trunk radius
-
-    mesh trunk = create_cylinder_mesh(r, h);
-    trunk.color.fill({0.5f, 0.7f, 0.4f});
-
-    mesh foliage = mesh_primitive_ellipsoid({r * 3, r * 3, h / 3}, {0, 0, 0});
-    foliage.apply_translation_to_position({0, 0, h});
-    foliage.color.fill({0.8f, 0.0f, 0.5f});
-
-    mesh flower = trunk;
-    flower.push_back(foliage);
-
-    return flower;
-}
 
 mesh create_orangeflower()
 {
     float h = 0.3f;  // trunk height
     float r = 0.02f; // trunk radius
 
-    mesh trunk = create_cylinder_mesh(0.7f*r, h);
+    mesh trunk = create_cylinder_mesh(0.2f*r, h);
     trunk.color.fill({0.4f, 0.6f, 0.3f});
 
     mesh flower = trunk;

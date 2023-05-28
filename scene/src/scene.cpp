@@ -14,7 +14,7 @@ void scene_structure::initialize()
 	// ********************************** //
 	camera_control.initialize(inputs, window); // Give access to the inputs and window global state to the camera controler
 	camera_control.set_rotation_axis_z();
-	camera_control.camera_model.look_at({10,6,6}, {0,0,0});
+	camera_control.camera_model.look_at({10, 6, 6}, {0, 0, 0});
 	global_frame.initialize_data_on_gpu(mesh_primitive_frame());
 
 	float room_length = 5.0f;
@@ -95,7 +95,7 @@ void scene_structure::initialize()
 	// ********************************** //
 
 	int N_terrain_samples = 100;
-	float terrain_length = 100;
+	float terrain_length = 20;
 	mesh const terrain_mesh = create_terrain_mesh(N_terrain_samples, terrain_length);
 	terrain.initialize_data_on_gpu(terrain_mesh);
 	terrain.material.color = {0.6f, 0.85f, 0.5f};
@@ -112,14 +112,31 @@ void scene_structure::initialize()
 
 	mesh const pinetree_mesh = create_pinetree_foliage();
 	pinetree.initialize_data_on_gpu(pinetree_mesh);
-	mesh const violetflower_mesh = create_violetflower();
-	violetflower.initialize_data_on_gpu(violetflower_mesh);
+
+	mesh rose_mesh = mesh_load_file_obj("assets/petals.obj");
+	rose.initialize_data_on_gpu(rose_mesh);
+	rose.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/wildtextures-leather-Campo-rose.jpg", GL_REPEAT, GL_REPEAT);
+	mesh tige_mesh = mesh_load_file_obj("assets/tige.obj");
+	tige.initialize_data_on_gpu(tige_mesh);
+	tige.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture-green-paper-pattern-scratch-background-photo-hd-wallpaper.jpg", GL_REPEAT, GL_REPEAT);
+
+	mesh mushroom_mesh = mesh_load_file_obj("assets/mushroom.obj");
+	mushroom_mesh.apply_scaling_to_position(0.01f);
+	mushroom.initialize_data_on_gpu(mushroom_mesh);
+	mushroom.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/wildtextures-leather-Campo-rose.jpg", GL_REPEAT, GL_REPEAT);
+	mushroom_mesh = mesh_load_file_obj("assets/tige_mushroom.obj");
+	mushroom_mesh.apply_scaling_to_position(0.01f);
+	mushroom_tige.initialize_data_on_gpu(mushroom_mesh);
+	mushroom_tige.material.color = {0.68f, 0.55f, 0.34f};
+
 	mesh const orangeflower_mesh = create_orangeflower();
 	orangeflower.initialize_data_on_gpu(orangeflower_mesh);
+
 	tree_position = generate_positions_on_terrain(N_trees, terrain_length);
 	pinetree_position = generate_positions_on_terrain(N_trees, terrain_length);
-	violetflower_position = generate_positions_on_terrain(2*N_trees, terrain_length);
-	orangeflower_position = generate_positions_on_terrain(2*N_trees, terrain_length);
+	rose_position = generate_positions_on_terrain(2 * N_trees, terrain_length);
+	orangeflower_position = generate_positions_on_terrain(2 * N_trees, terrain_length);
+	mushroom_position = generate_positions_on_terrain(N_trees, terrain_length);
 
 	// ********************************** //
 	//             Monkey face            //
@@ -139,8 +156,8 @@ void scene_structure::display_frame()
 	if (gui.display_frame)
 		draw(global_frame, environment);
 
-	draw(room1, environment);
-	draw(room2, environment);
+	//draw(room1, environment);
+	//draw(room2, environment);
 
 	timer.update();
 
@@ -148,12 +165,12 @@ void scene_structure::display_frame()
 	rotation_transform r_head = rotation_transform::from_axis_angle({0, 1, 0}, Pi / 6);
 	rotation_transform r_head_anim = rotation_transform::from_axis_angle({0, 1, 0}, 0.25f * cos(2 * timer.t));
 	hierarchy["head"].transform_local.rotation = r_head * r_head_anim;
-
 	hierarchy.update_local_to_global_coordinates();
+	hierarchy["body"].transform_local.translation = {0,0,evaluate_terrain_height(0,0)};
 
 	draw(hierarchy, environment);
-	//draw(monkey, environment);
-	
+	// draw(monkey, environment);
+
 	draw(terrain, environment);
 
 	for (int i = 0; i < N_trees; i++)
@@ -166,13 +183,21 @@ void scene_structure::display_frame()
 		trunk.model.translation = pinetree_position[i];
 		draw(pinetree, environment);
 		draw(trunk, environment);
-		violetflower.model.translation = violetflower_position[2 * i];
+		rose.model.translation = rose_position[2 * i];
+		tige.model.translation = rose_position[2 * i];
 		orangeflower.model.translation = orangeflower_position[2 * i];
-		draw(violetflower, environment);
+		mushroom.model.translation = mushroom_position[i];
+		mushroom_tige.model.translation = mushroom_position[i];
+		draw(mushroom, environment);
+		draw(rose, environment);
+		draw(tige, environment);
+		draw(mushroom_tige, environment);
 		draw(orangeflower, environment);
-		violetflower.model.translation = violetflower_position[2 * i + 1];
+		rose.model.translation = rose_position[2 * i + 1];
+		tige.model.translation = rose_position[2 * i + 1];
 		orangeflower.model.translation = orangeflower_position[2 * i + 1];
-		draw(violetflower, environment);
+		draw(rose, environment);
+		draw(tige, environment);
 		draw(orangeflower, environment);
 	}
 
@@ -181,6 +206,15 @@ void scene_structure::display_frame()
 		draw_wireframe(room1, environment);
 		draw_wireframe(room2, environment);
 		draw_wireframe(hierarchy, environment);
+		draw_wireframe(tree, environment);
+		draw_wireframe(trunk, environment);
+		draw_wireframe(pinetree, environment);
+		draw_wireframe(trunk, environment);
+		draw_wireframe(mushroom, environment);
+		draw_wireframe(rose, environment);
+		draw_wireframe(tige, environment);
+		draw_wireframe(mushroom_tige, environment);
+		draw_wireframe(orangeflower, environment);
 	}
 }
 
