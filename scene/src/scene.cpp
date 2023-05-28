@@ -105,6 +105,7 @@ void scene_structure::initialize()
 	// portal23 = room2->get_portal_2();
 
 	room1->get_portal_1()->link_portals(*room2->get_portal_1());
+	room1->get_portal_2()->link_portals(*room2->get_portal_2());
 }
 
 

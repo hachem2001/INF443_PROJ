@@ -54,6 +54,7 @@ public:
     ///@param environment The environment to draw in
     void draw_wireframe(cgp::environment_generic_structure& environment);
 
+    std::pair<glm::mat4, cgp::mat4> get_portal_view(cgp::camera_generic_base& camera);
 
     glm::mat4 const clippedProjMat(glm::mat4 const &viewMat, glm::mat4 const &projMat) const;
 };
