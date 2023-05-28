@@ -57,6 +57,16 @@ struct scene_structure : cgp::scene_inputs_generic {
 	// The entire hierarchy
 	cgp::hierarchy_mesh_drawable hierarchy;
 
+	cgp::mesh_drawable ground;
+	cgp::mesh_drawable lake;
+	cgp::mesh_drawable pineTrunks;
+	cgp::mesh_drawable pineFoliage;
+	cgp::mesh_drawable treeTrunks;
+	cgp::mesh_drawable treeFoliage;
+	cgp::mesh_drawable house;
+	cgp::mesh_drawable roof;
+	cgp::mesh_drawable wood;
+
 	int N_trees = 20;
 	cgp::mesh_drawable terrain;
 	cgp::mesh_drawable tree;

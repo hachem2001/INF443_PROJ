@@ -94,6 +94,53 @@ void scene_structure::initialize()
 	//            Forest scene            //
 	// ********************************** //
 
+	// pine trees
+	mesh pineFoliage_mesh = mesh_load_file_obj("assets/PineFoliage.obj");
+	pineFoliage_mesh.apply_scaling_to_position(20.0f);
+	pineFoliage.initialize_data_on_gpu(pineFoliage_mesh);
+	pineFoliage.material.color = {0.00f, 0.40f, 0.00f};
+	pineFoliage.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture_foliage_tree.jpg", GL_REPEAT, GL_REPEAT);
+	mesh pineTrunks_mesh = mesh_load_file_obj("assets/PineTrunks.obj");
+	pineTrunks_mesh.apply_scaling_to_position(20.0f);
+	pineTrunks.initialize_data_on_gpu(pineTrunks_mesh);
+	pineTrunks.material.color = {0.40f, 0.27f, 0.00f};
+	pineTrunks.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/trunk.jpg", GL_REPEAT, GL_REPEAT);
+
+	// trees
+	mesh treeFoliage_mesh = mesh_load_file_obj("assets/TreeFoliage.obj");
+	treeFoliage_mesh.apply_scaling_to_position(20.0f);
+	treeFoliage.initialize_data_on_gpu(treeFoliage_mesh);
+	treeFoliage.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture_foliage_tree.jpg", GL_REPEAT, GL_REPEAT);
+	mesh treeTrunks_mesh = mesh_load_file_obj("assets/TreeTrunks.obj");
+	treeTrunks_mesh.apply_scaling_to_position(20.0f);
+	treeTrunks.initialize_data_on_gpu(treeTrunks_mesh);
+	treeTrunks.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/trunk.jpg", GL_REPEAT, GL_REPEAT);
+
+	// ground and lake
+	mesh ground_mesh = mesh_load_file_obj("assets/Ground.obj");
+	ground_mesh.apply_scaling_to_position(20.0f);
+	ground.initialize_data_on_gpu(ground_mesh);
+	ground.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture_grass.png", GL_REPEAT, GL_REPEAT);
+	mesh lake_mesh = mesh_load_file_obj("assets/Lake.obj");
+	lake_mesh.apply_scaling_to_position(20.0f);
+	lake.initialize_data_on_gpu(lake_mesh);
+	lake.material.color = {0.60f, 0.80f, 1.00f};
+
+	// house
+	mesh house_mesh = mesh_load_file_obj("assets/House.obj");
+	house_mesh.apply_scaling_to_position(20.0f);
+	house.initialize_data_on_gpu(house_mesh);
+	mesh roof_mesh = mesh_load_file_obj("assets/Roofs.obj");
+	roof_mesh.apply_scaling_to_position(20.0f);
+	roof.initialize_data_on_gpu(roof_mesh);
+	roof.material.color = {0.60f,0.00f,0.00f};
+	mesh wood_mesh = mesh_load_file_obj("assets/HouseWood.obj");
+	wood_mesh.apply_scaling_to_position(20.0f);
+	wood.initialize_data_on_gpu(wood_mesh);
+	wood.material.color = {0.40f, 0.27f, 0.00f};
+
+
+	/*
 	int N_terrain_samples = 100;
 	float terrain_length = 20;
 	mesh const terrain_mesh = create_terrain_mesh(N_terrain_samples, terrain_length);
@@ -138,6 +185,8 @@ void scene_structure::initialize()
 	orangeflower_position = generate_positions_on_terrain(2 * N_trees, terrain_length);
 	mushroom_position = generate_positions_on_terrain(N_trees, terrain_length);
 
+	*/
+
 	// ********************************** //
 	//             Monkey face            //
 	// ********************************** //
@@ -156,9 +205,22 @@ void scene_structure::display_frame()
 	if (gui.display_frame)
 		draw(global_frame, environment);
 
-	//draw(room1, environment);
-	//draw(room2, environment);
+	// draw(room1, environment);
+	// draw(room2, environment);
 
+	draw(ground, environment);
+	draw(lake, environment);
+
+	draw(pineTrunks, environment);
+	draw(pineFoliage, environment);
+	draw(treeTrunks, environment);
+	draw(treeFoliage, environment);
+
+	draw(roof, environment);
+	draw(wood, environment);
+	draw(house,environment);
+
+	/*
 	timer.update();
 
 	// Apply transformation to some elements of the hierarchy
@@ -200,6 +262,8 @@ void scene_structure::display_frame()
 		draw(tige, environment);
 		draw(orangeflower, environment);
 	}
+
+	*/
 
 	if (gui.display_wireframe)
 	{

@@ -7,18 +7,8 @@ using namespace cgp;
 // Evaluate 3D position of the terrain for any (x,y)
 float evaluate_terrain_height(float x, float y)
 {
-    vec2 p_i[4] = { {-10,-10}, {5,5}, {-3,4}, {6,4} };
-    float h_i[4] = {4.0f, -2.0f, 2.0f, 3.0f};
-    float sigma_i[4] = {10.0f,3.0f,4.0f,4.0f};
 
-    float z = 0;
-
-    for (int i =0 ; i<4 ; i++){
-        float d = norm(vec2(x, y) - p_i[i]) / sigma_i[i];
-        z += h_i[i] * std::exp(-d * d);
-    }
-
-    return z;
+    return 2.5f;
 }
 
 mesh create_terrain_mesh(int N, float terrain_length)
