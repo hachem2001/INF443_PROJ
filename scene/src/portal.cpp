@@ -111,15 +111,18 @@ portal::portal(float room_height, cgp::vec3 position = {0,0,0})
 
     portal_mesh = create_portal_mesh(room_height);
 
+    position_of_center = position + (portal_mesh.position[0] + portal_mesh.position[2])/2.f;
+
+
     portal_mesh.color.fill({0.8f, 0.3f, 0.3f});
     portal_mesh_drawable.initialize_data_on_gpu(portal_mesh);
     portal_mesh_drawable.model.translation = position;
+    std::cout << portal_mesh_drawable.model.rotation.data << std::endl;
 
     associated_camera_sphere_representative = cgp::mesh_primitive_sphere(0.4f);
     associated_camera_sphere_representative.color.fill({0.1f, 0.3f, 0.3f});
     associated_camera_sphere_representative_drawable.initialize_data_on_gpu(associated_camera_sphere_representative);
 
-    position_of_center = (portal_mesh.position[0] + portal_mesh.position[2])/2.f;
     normal = {0.f, 1.f, 0.f};
 
     glm_position = glm::vec3(position_of_center[0], position_of_center[1], position_of_center[2]);
@@ -167,25 +170,32 @@ std::pair<glm::mat4, cgp::mat4> portal::get_portal_view(cgp::camera_generic_base
 
     matrix_of_in_portal = convert_cgp_to_glm_mat4(cgp_moip);//constructTransformationMatrix(position_of_center, glm_orientation, portal_mesh_drawable.model.scaling_xyz);
     matrix_of_destination_portal = convert_cgp_to_glm_mat4(cgp_modp);//constructTransformationMatrix(connected_portal->position_of_center, connected_portal->glm_orientation, connected_portal->portal_mesh_drawable.model.scaling_xyz);
+    
+    //matrix_of_in_portal = constructTransformationMatrix(position_of_center, glm_orientation, portal_mesh_drawable.model.scaling_xyz);
+    //matrix_of_destination_portal = constructTransformationMatrix(connected_portal->position_of_center, connected_portal->glm_orientation, connected_portal->portal_mesh_drawable.model.scaling_xyz);
 
     //cgp_cv.set_translation(camera.position());
 
     camera_view = convert_cgp_to_glm_mat4(cgp_cv);
     camera_frame = convert_cgp_to_glm_mat4(cgp_cfr);
-    // cgp::mat4 cgp_moip = convert_glm_to_cgp_mat4(matrix_of_in_portal);
-    // cgp::mat4 cgp_modp = convert_glm_to_cgp_mat4(matrix_of_destination_portal);
+    //cgp::mat4 cgp_moip = convert_glm_to_cgp_mat4(matrix_of_in_portal);
+    //cgp::mat4 cgp_modp = convert_glm_to_cgp_mat4(matrix_of_destination_portal);
 
 
 
-     std::cout << "In portal matrix : " << portal_mesh_drawable.model.matrix() << std::endl;
-     std::cout << "In portal model translation : " << portal_mesh_drawable.model.translation << std::endl;
-    // std::cout << "In portal : " << position_of_center << std::endl;
+    std::cout << "In portal matrix : " << portal_mesh_drawable.model.matrix() << std::endl;
+    std::cout << "In portal model translation : " << portal_mesh_drawable.model.matrix().get_translation() << std::endl;
+    std::cout << "In portal : " << position_of_center << std::endl;
     // std::cout << "Out portal : " << connected_portal->position_of_center << std::endl;
     //std::cout << "Camera : " << camera.matrix_view() * camera.matrix_frame() << std::endl;
 
-    
+    // std::cout << convert_glm_to_cgp_mat4(glm::mat4(1.0f)) << std::endl;
 
-    glm::mat4 the_portals_view = glm::inverse( camera_frame * matrix_of_destination_portal * (glm::inverse(matrix_of_in_portal)) );
+    glm::mat4 tcf = camera_frame * matrix_of_destination_portal * glm::inverse(matrix_of_in_portal);
+
+    //glm::mat4 tcf = camera_frame * glm::rotate(matrix_of_destination_portal, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f)) * glm::inverse(matrix_of_in_portal);
+
+    glm::mat4 the_portals_view = glm::inverse( tcf ); // camera_frame * matrix_of_destination_portal * glm::inverse(matrix_of_in_portal));
     //portal_view(camera_view, matrix_of_in_portal, matrix_of_destination_portal, glm_orientation) ; 
     cgp::mat4 the_portals_view_cgp = convert_glm_to_cgp_mat4(the_portals_view);
 

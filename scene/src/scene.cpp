@@ -14,6 +14,7 @@ void scene_structure::initialize()
 	// ***************************************** //
 	camera_control.initialize(inputs, window); // Give access to the inputs and window global state to the camera controler
 	camera_control.set_rotation_axis_z();
+	camera_control.camera_model.set_rotation_axis({0.0f, 0.0f, 1.0f});
 	camera_control.camera_model.look_at({ 15.0f,6.0f,6.0f }, {0,0,0});
 	global_frame.initialize_data_on_gpu(mesh_primitive_frame());
 
@@ -38,7 +39,7 @@ void scene_structure::initialize()
 	room1->room_mesh_drawable.material.phong.specular = 0.0f;
 
 	//room 2
-	room2 = new room(room2_length, room_depth, room_height, {room1_length+1.0f, 0, room_height+1.0f});
+	room2 = new room(room1_length, room_depth, room_height, {room1_length+0.5f, room_depth+0.5f, 0.0f});
 
 	room2->room_mesh_drawable.material.color = { 0.5f,0.5f,0.7f };
 	room2->room_mesh_drawable.material.phong.specular = 0.0f;
