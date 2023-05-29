@@ -170,7 +170,7 @@ glm::mat4 portal_view(glm::mat4 camera_view, glm::mat4 matrix_of_in_portal, glm:
 portal::portal(float room_height, cgp::vec3 position = { 0,0,0 }, float rotation)
 {
     linked = false;
-    rotation = 0.f;
+    this->rotation = rotation;
 
     portal_mesh = create_portal_mesh(room_height);
 
@@ -228,19 +228,32 @@ void portal::link_portals(portal& portal2)
 
 }
 
-std::pair<glm::mat4, cgp::mat4> portal::get_portal_view(cgp::camera_generic_base& camera) {
+std::pair<glm::mat4, cgp::mat4> portal::get_portal_view(cgp::mat4& cam_v, cgp::mat4& cam_f) {
     glm::mat4 camera_view;
     glm::mat4 camera_frame;
     glm::mat4 matrix_of_in_portal;
     glm::mat4 matrix_of_destination_portal;
 
-    cgp::mat4 cgp_cv = camera.matrix_view();
-    cgp::mat4 cgp_cfr = camera.matrix_frame();
+    cgp::mat4 cgp_cv = cam_v;
+    cgp::mat4 cgp_cfr = cam_f;
     cgp::mat4 cgp_moip = portal_mesh_drawable.model.matrix();
     cgp::mat4 cgp_modp = connected_portal->portal_mesh_drawable.model.matrix();
 
-    matrix_of_in_portal = glm::rotate(convert_cgp_to_glm_mat4(cgp_moip), glm::radians(0.f), {0.f, 0.f, 1.f});//constructTransformationMatrix(position_of_center, glm_orientation, portal_mesh_drawable.model.scaling_xyz);
-    matrix_of_destination_portal = convert_cgp_to_glm_mat4(cgp_modp);//constructTransformationMatrix(connected_portal->position_of_center, connected_portal->glm_orientation, connected_portal->portal_mesh_drawable.model.scaling_xyz);
+
+    cgp::mat4 mon_cgp_moip = cgp::mat4::build_identity();
+    cgp::mat4 mon_cgp_modp = cgp::mat4::build_identity();
+
+    cgp::vec3 poc = cgp_moip.col_w_vec3(), connected_poc = cgp_modp.col_w_vec3();
+
+    mon_cgp_moip.set_translation(poc); //position_of_center);
+    mon_cgp_modp.set_translation(connected_poc); //connected_portal->position_of_center);
+
+    cgp::rotation_transform mon_cgp_moip_rot = portal_mesh_drawable.model.rotation;
+    cgp::rotation_transform mon_cgp_modp_rot = connected_portal->portal_mesh_drawable.model.rotation;
+
+
+    matrix_of_in_portal = glm::rotate(convert_cgp_to_glm_mat4(mon_cgp_moip), glm::radians(0.f), {0.f, 0.f, 1.f});//constructTransformationMatrix(position_of_center, glm_orientation, portal_mesh_drawable.model.scaling_xyz);
+    matrix_of_destination_portal = convert_cgp_to_glm_mat4(mon_cgp_modp);//constructTransformationMatrix(connected_portal->position_of_center, connected_portal->glm_orientation, connected_portal->portal_mesh_drawable.model.scaling_xyz);
 
     //matrix_of_in_portal = constructTransformationMatrix(position_of_center, glm_orientation, portal_mesh_drawable.model.scaling_xyz);
     //matrix_of_destination_portal = constructTransformationMatrix(connected_portal->position_of_center, connected_portal->glm_orientation, connected_portal->portal_mesh_drawable.model.scaling_xyz);
@@ -262,21 +275,21 @@ std::pair<glm::mat4, cgp::mat4> portal::get_portal_view(cgp::camera_generic_base
 
     // std::cout << convert_glm_to_cgp_mat4(glm::mat4(1.0f)) << std::endl;
 
-    glm::mat4 tcf = camera_frame * matrix_of_destination_portal * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f)) * glm::inverse(matrix_of_in_portal);
+    glm::mat4 tcf = camera_frame * matrix_of_destination_portal * glm::inverse(matrix_of_in_portal);
 
     cgp::rotation_transform a = cgp::rotation_transform::from_axis_angle({0.0f, 0.0f, 1.f}, M_PI);
-    cgp::affine_rt b = cgp::rotation_around_center(a, connected_portal->position_of_center);
+    cgp::affine_rt b = cgp::rotation_around_center(a, connected_poc); // connected_portal->position_of_center);
+
+    cgp::affine_rt c_in = cgp::rotation_around_center(mon_cgp_moip_rot, connected_poc); //connected_portal->position_of_center);
+    cgp::affine_rt c_out = cgp::rotation_around_center(mon_cgp_modp_rot, connected_poc); //connected_portal->position_of_center);
 
     glm::mat4 b_glm = convert_cgp_to_glm_mat4(b.matrix());
-
-    //glm::mat4 tcf = camera_frame * glm::rotate(matrix_of_destination_portal, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f)) * glm::inverse(matrix_of_in_portal);
-
-    glm::mat4 the_portals_view = glm::inverse(tcf * b_glm); // camera_frame * matrix_of_destination_portal * glm::inverse(matrix_of_in_portal));
     
-    //cgp::mat4 tcf_i_cgp_attempt = cgp::inverse(cgp_cfr * cgp_modp * cgp::inverse(cgp_moip));
+    glm::mat4 c_in_glm = convert_cgp_to_glm_mat4(c_in.matrix());
+    glm::mat4 c_out_glm = convert_cgp_to_glm_mat4(c_out.matrix());
 
-    //portal_view(camera_view, matrix_of_in_portal, matrix_of_destination_portal, glm_orientation) ; 
-    //the_portals_view = convert_cgp_to_glm_mat4(tcf_i_cgp_attempt);
+    glm::mat4 the_portals_view = glm::inverse(tcf * b_glm * c_in_glm * glm::inverse(c_out_glm));
+    
     cgp::mat4 the_portals_view_cgp = convert_glm_to_cgp_mat4(the_portals_view);
 
     return std::pair<glm::mat4, cgp::mat4>(the_portals_view, the_portals_view_cgp);
@@ -285,6 +298,30 @@ std::pair<glm::mat4, cgp::mat4> portal::get_portal_view(cgp::camera_generic_base
 void portal::draw_begin(cgp::camera_generic_base& camera, cgp::mat4& camera_projection_matrix, environment_structure& environment) {
     opengl_check;
     if (linked) {
+        // glDisable(GL_DEPTH_TEST);
+
+		// // Disable color and depth drawing
+		// glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+		// glDepthMask(GL_FALSE);
+
+		// // Disable depth test
+		// glDisable(GL_DEPTH_TEST);
+
+		// // Enable stencil test, to prevent drawing outside
+		// // region of current portal depth
+		// glEnable(GL_STENCIL_TEST);
+
+		// // Fail stencil test when inside of outer portal
+		// // (fail where we should be drawing the inner portal)
+		// glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+
+		// // Increment stencil value on stencil fail
+		// // (on area of inner portal)
+		// glStencilOp(GL_INCR, GL_KEEP, GL_KEEP);
+
+		// // Enable (writing into) all stencil bits
+		// glStencilMask(0xFF);
+        /*
         //glUseProgram(portal_mesh_drawable.shader.id); opengl_check;
         glEnable(GL_STENCIL_TEST);
         // Everything happens in-between
@@ -304,8 +341,12 @@ void portal::draw_begin(cgp::camera_generic_base& camera, cgp::mat4& camera_proj
         glStencilMask(0x00);
         glStencilFunc(GL_EQUAL, 1, 0xFF);
 
+
+        */ 
         // Move the camera to the right position
-        std::pair<glm::mat4, cgp::mat4> p = get_portal_view(camera);
+        
+        cgp::mat4 cv = camera.matrix_view(), cf = camera.matrix_frame();
+        std::pair<glm::mat4, cgp::mat4> p = get_portal_view(cv, cf);
         glm::mat4 the_portals_view = p.first;
         cgp::mat4 the_portals_view_cgp = p.second;
 
@@ -337,9 +378,8 @@ void portal::draw_end(cgp::camera_generic_base& camera, cgp::mat4& camera_projec
         // environment.send_opengl_uniform(portal_mesh_drawable.shader, false);
 
         glDisable(GL_STENCIL_TEST);
-        //glUseProgram(0);
-
-        std::pair<glm::mat4, cgp::mat4> p = get_portal_view(camera);
+        cgp::mat4 cv = camera.matrix_view(), cf = camera.matrix_frame();
+        std::pair<glm::mat4, cgp::mat4> p = get_portal_view(cv, cf);
         glm::mat4 the_portals_view = p.first;
         cgp::mat4 the_portals_view_cgp = p.second;
 
@@ -350,6 +390,15 @@ void portal::draw_end(cgp::camera_generic_base& camera, cgp::mat4& camera_projec
     else {
         cgp::draw(portal_mesh_drawable, environment);
     }
+}
+
+void portal::draw_stencil(environment_structure& environment)
+{
+    cgp::draw(portal_mesh_drawable, environment);
+    
+    // associated_camera_sphere_representative_drawable.model.translation = cgp::inverse(environment.camera_view).col_w_vec3();
+    // cgp::draw(associated_camera_sphere_representative_drawable, environment);
+
 }
 
 // Fun idea : what if everything behind a "draw_wireframe" linked portal would be drawn in wireframes? Heh that'd be cool 

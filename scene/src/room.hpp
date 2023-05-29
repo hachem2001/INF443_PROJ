@@ -22,7 +22,7 @@ public:
     /// @param room_depth Room's depth
     /// @param room_height Room's height
     /// @param position Where the down_left_in corner should be positioned.
-    room(float room_length, float room_depth, float room_height, vec3 position);
+    room(float room_length, float room_depth, float room_height, vec3 position, float portal_rot_1=0.f, float portal_rot_2=0.f);
 
     /// @brief Returns a pointer to the first portal
     portal* get_portal_1();

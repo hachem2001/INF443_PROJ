@@ -30,6 +30,8 @@ struct scene_structure : cgp::scene_inputs_generic {
 	// Elements and shapes of the scene
 	// ****************************** //
 
+	int max_recursion_level = 1;
+
 	camera_controller_custom camera_control;
 	camera_projection_perspective camera_projection;
 	window_structure window;
@@ -38,6 +40,10 @@ struct scene_structure : cgp::scene_inputs_generic {
 	environment_structure environment;   // Standard environment controler
 	input_devices inputs;                // Storage for inputs status (mouse, keyboard, window dimension)
 	gui_parameters gui;                  // Standard GUI element storage
+
+	std::vector<portal*> portals_to_draw;
+
+	
 
 	// ****************************** //
 	// Elements and shapes of the scene
@@ -67,11 +73,6 @@ struct scene_structure : cgp::scene_inputs_generic {
 	// room room3;
 	// room room4;
 
-	portal* portal12; // Our two test ones here
-	portal* portal14;
-	portal* portal21; // and here
-	portal* portal23;
-
 	// portal portal12;
 	// portal portal14;
 	// portal portal21;
@@ -88,7 +89,13 @@ struct scene_structure : cgp::scene_inputs_generic {
 
 	void initialize();    // Standard initialization to be called before the animation loop
 	void display_frame(); // The frame display to be called within the animation loop
-	void display_frame_from_portal(portal& portal); // Display the scene from a portal's point of view.
+	
+	void set_view_m(cgp::mat4& view_m); // Sets the view matrix to view_m
+	void set_proj_m(cgp::mat4& proj_m); // Sets the projection matrix to proj_m 
+	
+
+	void draw_non_portal(cgp::mat4& view_m, cgp::mat4& proj_m); // Draws everything that ISN'T a portal.
+	void display_portals_recursion(cgp::mat4 view_m, cgp::mat4 proj_m, int recursion_level); // Display the scene from a portal's point of view.
 	void display_gui();   // The display of the GUI, also called within the animation loop
 
 	void mouse_move_event();

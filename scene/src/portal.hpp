@@ -17,6 +17,8 @@ public:
     cgp::vec3 position_of_center;
     cgp::vec3 normal;
 
+    float rotation_around_z;
+
     glm::vec3 glm_position;
     glm::fquat glm_orientation;
 
@@ -50,14 +52,24 @@ public:
     void draw_end(cgp::camera_generic_base& camera, cgp::mat4& camera_projection_matrix, environment_structure& environment); //, scene_structure* scene);
 
 
+    ///@brief Draws the stencil of the buffer!
+    void draw_stencil(environment_structure& environment);
+
     ///@brief Draws the portal's wireframe in environment using cgp
     ///@param environment The environment to draw in
     void draw_wireframe(cgp::environment_generic_structure& environment);
 
-    std::pair<glm::mat4, cgp::mat4> get_portal_view(cgp::camera_generic_base& camera);
+
+    ///@brief Calculate's the portal's view matrix
+    ///@param cam_v : camera's view matrix
+    ///@param cam_f : camera's frame matrix
+    std::pair<glm::mat4, cgp::mat4> get_portal_view(cgp::mat4& cam_v, cgp::mat4& cam_f);
 
     glm::mat4 const clippedProjMat(glm::mat4 const &viewMat, glm::mat4 const &projMat) const;
 };
 
 cgp::mesh create_portal_mesh(float room_height);
 bool portal_intersection(cgp::vec3 la, cgp::vec3 lb, portal& portal);
+glm::mat4 convert_cgp_to_glm_mat4(cgp::mat4 thematrix_inquestion);
+cgp::mat4 convert_glm_to_cgp_mat4(glm::mat4 thematrix_inquestion);
+glm::vec4 convert_cgp_to_glm_vec4(cgp::vec3 thematrix_inquestion);

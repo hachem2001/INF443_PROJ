@@ -51,7 +51,7 @@ void scene_structure::initialize()
 	room1->room_mesh_drawable.material.phong.specular = 0.0f;
 
 	//room 2
-	room2 = new room(room1_length, room_depth, room_height, {room1_length+0.5f, room_depth+0.5f, 0.0f});
+	room2 = new room(room2_length, room_depth, room_height, {room2_length+0.5f, room_depth+0.5f, 0.0f}, M_PI_2);
 
 	room2->room_mesh_drawable.material.color = { 0.5f,0.5f,0.7f };
 	room2->room_mesh_drawable.material.phong.specular = 0.0f;
@@ -124,6 +124,11 @@ void scene_structure::initialize()
     // cgp::affine_rt b = cgp::rotation_around_center(a, {0.f, 0.f, 0.f});
 
     // room1->get_portal_1()->portal_mesh_drawable.model = cgp::affine_rt(a, room1->get_portal_1()->position_of_center);
+
+	portals_to_draw.push_back(room1->get_portal_1());
+	portals_to_draw.push_back(room1->get_portal_2());
+	portals_to_draw.push_back(room2->get_portal_1());
+	portals_to_draw.push_back(room2->get_portal_2());
 }
 
 
@@ -134,90 +139,133 @@ void scene_structure::display_frame()
 
 	//player.model.translation = camera_control.camera_model.position();
 	environment.light = camera_control.camera_model.position();
-	
+
+	//glStencilMask(0xFF);
+	display_portals_recursion(environment.camera_view, environment.camera_projection, 0);
+
 	if (gui.display_frame)
 		draw(global_frame, environment);
 
+}
 
-	/*
-	draw(room1, environment);
-	draw(room2, environment);
-	draw(room3, environment);
-	draw(room4, environment);
-	draw(portal12, environment);
-	draw(portal14, environment);
-	draw(portal21, environment);
-	draw(portal23, environment);
-	draw(portal32, environment);
-	draw(portal34, environment);
-	draw(portal43, environment);
-	draw(portal41, environment);
-	*/
-	//draw(room1->room_mesh_drawable, environment);
-	mat4 camera_projection_m = camera_projection.matrix();
+void scene_structure::set_view_m(cgp::mat4& view_m)
+{
+	environment.camera_view = view_m;
+	// MAYBE ALSO SET LIGHT OT VIEW M POSITION HERE??
+}
 
+void scene_structure::set_proj_m(cgp::mat4& proj_m)
+{
+	environment.camera_projection = proj_m;
+}
 
+void scene_structure::draw_non_portal(cgp::mat4& view_m, cgp::mat4& proj_m)
+{
+	set_view_m(view_m);
+	set_proj_m(proj_m);
+	
+	
 	room1->draw(environment);
 	room2->draw(environment);
 	draw(player, environment);
-
-	//glClear(GL_DEPTH_BUFFER_BIT);
-	room1->first_portal.draw_begin(camera_control.camera_model, camera_projection_m, environment);
-	display_frame_from_portal(room1->first_portal);
-	room1->first_portal.draw_end(camera_control.camera_model,camera_projection_m, environment);
-
-	room1->second_portal.draw_begin(camera_control.camera_model,camera_projection_m, environment);
-	display_frame_from_portal(room1->first_portal);
-	room1->second_portal.draw_end(camera_control.camera_model,camera_projection_m, environment);
-
-	room2->first_portal.draw_begin(camera_control.camera_model,camera_projection_m, environment);
-	display_frame_from_portal(room1->first_portal);
-	room2->first_portal.draw_end(camera_control.camera_model,camera_projection_m, environment);
-
-	room2->second_portal.draw_begin(camera_control.camera_model,camera_projection_m, environment);
-	display_frame_from_portal(room1->first_portal);
-	room2->second_portal.draw_end(camera_control.camera_model,camera_projection_m, environment);
-
-
-	if (gui.display_wireframe){
-		/*
-		draw_wireframe(room1, environment);
-		draw_wireframe(room2, environment);
-		draw_wireframe(room3, environment);
-		draw_wireframe(room4, environment);
-		draw_wireframe(portal12, environment);
-		draw_wireframe(portal14, environment);
-		draw_wireframe(portal21, environment);
-		draw_wireframe(portal23, environment);
-		draw_wireframe(portal32, environment);
-		draw_wireframe(portal34, environment);
-		draw_wireframe(portal43, environment);
-		draw_wireframe(portal41, environment);
-		*/
-
-	}
-
 }
 
-void scene_structure::display_frame_from_portal(portal& portal)
+
+// Much inspiration was taken from : https://github.com/ThomasRinsma/opengl-game-test/blob/8363bbfcce30acc458b8faacc54c199279092f81/src/scene.cc
+void scene_structure::display_portals_recursion(cgp::mat4 view_m, cgp::mat4 proj_m, int recursion_level)
 {
 	// This function is supposed to do basically the same thing as what is shown before, except it doesn't bother showing anything
 	// that is outside the view of the portal. Well, I didn't bother tbh...
 	
-	vec3 const& background_color = environment.background_color;
-	glClearColor(background_color.x, background_color.y, background_color.z, 1.0f);
-
     // now draw the portal object again
 
 	// POUR LINSTANT : RIEN DE RECURSIF. Chuis pas assez fort pour ça.
-	if (portal.linked) {
-		room1->draw(environment);
-		room2->draw(environment);
-		draw(player, environment);
-	}
-	//display_frame();
+	
+	// Draw scene objects normally, only at recursionLevel
 
-	// and reset what you changed so the rest of the code works
+
+	for (int i=0; i<portals_to_draw.size(); i++) {
+
+		if (! portals_to_draw[i]->linked)
+			continue;
+
+        glEnable(GL_STENCIL_TEST);
+        // Everything happens in-between
+        
+        glStencilFunc(GL_NEVER, 1, 0xFF);
+        glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP); // Stencil options and parameters
+        glStencilMask(0XEF); // To clip anything not seen
+        glClear(GL_STENCIL_BUFFER_BIT);
+
+        // BEGIN DRAW STENCIl
+        //cgp::draw(portal_mesh_drawable, environment);
+		set_view_m(view_m);
+		set_proj_m(proj_m);
+		portals_to_draw[i]->draw_stencil(environment);
+        // END DRAW STENCIL
+        
+        glClear(GL_DEPTH_BUFFER_BIT);
+        // THe stencil mask!
+        glStencilMask(0x00);
+        glStencilFunc(GL_EQUAL, 1, 0xFF);
+
+		cgp::mat4 fm = cgp::inverse(view_m);
+		std::pair<glm::mat4, cgp::mat4> p = portals_to_draw[i]->get_portal_view(view_m, fm);
+
+        glm::mat4 proj_clipped = portals_to_draw[i]->clippedProjMat(p.first, convert_cgp_to_glm_mat4(proj_m));
+		cgp::mat4 proj_clipped_cgp = convert_glm_to_cgp_mat4(proj_clipped);
+
+		draw_non_portal(p.second, proj_clipped_cgp);
+		
+		glDisable(GL_STENCIL_TEST);
+	}
+	
+	// Disable the stencil test and stencil writing
+	// glDisable(GL_STENCIL_TEST);
+	// glStencilMask(0x00);
+
+	// // Disable color writing
+	// glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+
+	// // Enable the depth test, and depth writing.
+	// glEnable(GL_DEPTH_TEST);
+	// glDepthMask(GL_TRUE);
+
+	// // Make sure we always write the data into the buffer
+	// glDepthFunc(GL_ALWAYS);
+
+	// // Clear the depth buffer
+	// glClear(GL_DEPTH_BUFFER_BIT);
+
+	// // Draw portals into depth buffer
+	// set_view_m(view_m);
+	// set_proj_m(proj_m);
+	// for (int i=0; i<portals_to_draw.size(); i++) {
+	// 	if (!portals_to_draw[i]->linked) 
+	// 		continue;
+	// 	portals_to_draw[i]->draw_stencil(environment);
+	// }
+	
+	// // Reset the depth function to the default
+	// glDepthFunc(GL_LESS);
+
+	// // Enable stencil test and disable writing to stencil buffer
+	// glEnable(GL_STENCIL_TEST);
+	// glStencilMask(0x00);
+
+	// // Draw at stencil >= recursionlevel
+	// // which is at the current level or higher (more to the inside)
+	// // This basically prevents drawing on the outside of this level.
+	// glStencilFunc(GL_LEQUAL, recursion_level, 0xFF);
+
+	// // Enable color and depth drawing again
+	// glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	// glDepthMask(GL_TRUE);
+
+	// // And enable the depth test
+	// glEnable(GL_DEPTH_TEST);
+	draw_non_portal(view_m, proj_m);
+
 }
 
 void scene_structure::display_gui()
