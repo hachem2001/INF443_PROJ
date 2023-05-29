@@ -14,13 +14,12 @@ void scene_structure::initialize()
 	global_frame.initialize_data_on_gpu(mesh_primitive_frame());
 
 	// ***************************************** //
-	// Set-up 4 rooms
+	// Set-up 3 rooms
 	// ***************************************** //
 
 	float room1_length = 5.0f; //more than 4.0f
 	float room2_length = 10.0f; //more than 4.0f
 	float room3_length = 4.0f; //more than 4.0f
-	float room4_length = 8.0f; //more than 4.0f
 	float room_depth = 2.0f;
 	float room_height = 2.0f;
 
@@ -48,20 +47,23 @@ void scene_structure::initialize()
 	room3.material.color = { 0.7f,0.5f,0.5f };
 	room3.material.phong.specular = 0.0f; // non-specular terrain material
 
-	// room 4
-	mesh room4_mesh = create_room_mesh(room4_length, room_depth, room_height);
-	room4_mesh.apply_translation_to_position({room1_length+room2_length+room3_length+3.0f, 0, 0});
-	room4.initialize_data_on_gpu(room4_mesh);
-	
-	room4.material.color = { 0.5f,0.5f,0.5f };
-	room4.material.phong.specular = 0.0f; // non-specular terrain material
+	// ***************************************** //
+	//                 Decoration                //
+	// ***************************************** //
+
+	mesh suzanne_mesh = mesh_load_file_obj("assets/suzanne.obj");
+    suzanne_mesh.apply_scaling_to_position(0.3f);
+	suzanne_mesh.apply_rotation_to_position({0,0,1}, 2*Pi/3);
+	suzanne_mesh.apply_translation_to_position({0.4,0.5,0.5});
+    monkey.initialize_data_on_gpu(suzanne_mesh);
+    monkey.material.color = {0.68f, 0.55f, 0.34f};
 
 	// ***************************************** //
 	// Set-up portals
 	// ***************************************** //
-	mesh portal14_mesh = create_portal_mesh(room_height);
-	portal14_mesh.apply_translation_to_position({0.5f, room_depth, 0});
-	portal14.initialize_data_on_gpu(portal14_mesh);
+	mesh portal13_mesh = create_portal_mesh(room_height);
+	portal13_mesh.apply_translation_to_position({0.5f, room_depth, 0});
+	portal13.initialize_data_on_gpu(portal13_mesh);
 
 	mesh portal12_mesh = create_portal_mesh(room_height);
 	portal12_mesh.apply_translation_to_position({room1_length-1.5f, room_depth, 0});
@@ -79,17 +81,9 @@ void scene_structure::initialize()
 	portal32_mesh.apply_translation_to_position({0.5f+room1_length+room2_length+2.0f, room_depth, 0});
 	portal32.initialize_data_on_gpu(portal32_mesh);
 
-	mesh portal34_mesh = create_portal_mesh(room_height);
-	portal34_mesh.apply_translation_to_position({room3_length-1.5f+room1_length+room2_length+2.0f, room_depth, 0});
-	portal34.initialize_data_on_gpu(portal34_mesh);
-
-	mesh portal43_mesh = create_portal_mesh(room_height);
-	portal43_mesh.apply_translation_to_position({0.5f+room1_length+room2_length+room3_length+3.0f, room_depth, 0});
-	portal43.initialize_data_on_gpu(portal43_mesh);
-
-	mesh portal41_mesh = create_portal_mesh(room_height);
-	portal41_mesh.apply_translation_to_position({room4_length-1.5f+room1_length+room2_length+room3_length+3.0f, room_depth, 0});
-	portal41.initialize_data_on_gpu(portal41_mesh);
+	mesh portal31_mesh = create_portal_mesh(room_height);
+	portal31_mesh.apply_translation_to_position({room3_length-1.5f+room1_length+room2_length+2.0f, room_depth, 0});
+	portal31.initialize_data_on_gpu(portal31_mesh);
 }
 
 
@@ -104,30 +98,25 @@ void scene_structure::display_frame()
 	draw(room1, environment);
 	draw(room2, environment);
 	draw(room3, environment);
-	draw(room4, environment);
+	draw(monkey, environment);
 	draw(portal12, environment);
-	draw(portal14, environment);
+	draw(portal13, environment);
 	draw(portal21, environment);
 	draw(portal23, environment);
 	draw(portal32, environment);
-	draw(portal34, environment);
-	draw(portal43, environment);
-	draw(portal41, environment);
+	draw(portal31, environment);
 	
 
 	if (gui.display_wireframe){
 		draw_wireframe(room1, environment);
 		draw_wireframe(room2, environment);
 		draw_wireframe(room3, environment);
-		draw_wireframe(room4, environment);
 		draw_wireframe(portal12, environment);
-		draw_wireframe(portal14, environment);
+		draw_wireframe(portal13, environment);
 		draw_wireframe(portal21, environment);
 		draw_wireframe(portal23, environment);
 		draw_wireframe(portal32, environment);
-		draw_wireframe(portal34, environment);
-		draw_wireframe(portal43, environment);
-		draw_wireframe(portal41, environment);
+		draw_wireframe(portal31, environment);
 	}
 
 }
