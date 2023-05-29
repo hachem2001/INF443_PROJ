@@ -66,6 +66,8 @@ struct scene_structure : cgp::scene_inputs_generic {
 	cgp::mesh_drawable house;
 	cgp::mesh_drawable roof;
 	cgp::mesh_drawable wood;
+	cgp::mesh_drawable barrel;
+	cgp::mesh_drawable stone;
 
 	int N_trees = 20;
 	cgp::mesh_drawable terrain;

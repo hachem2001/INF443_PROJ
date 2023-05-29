@@ -1,9 +1,9 @@
 #include "scene.hpp"
 
 #include "room.hpp"
-#include "terrain.hpp"
 #include "nature.hpp"
 #include "monkey.hpp"
+#include "scene_mesh.hpp"
 
 using namespace cgp;
 
@@ -16,6 +16,10 @@ void scene_structure::initialize()
 	camera_control.set_rotation_axis_z();
 	camera_control.camera_model.look_at({10, 6, 6}, {0, 0, 0});
 	global_frame.initialize_data_on_gpu(mesh_primitive_frame());
+
+	// ********************************** //
+	//               Rooms                //
+	// ********************************** //
 
 	float room_length = 5.0f;
 	float room_depth = 2.0f;
@@ -39,106 +43,60 @@ void scene_structure::initialize()
 	//          Rabbit animation          //
 	// ********************************** //
 
-	mesh_drawable body;
-	mesh_drawable head;
-	mesh_drawable left_foot;
-	mesh_drawable right_foot;
-	mesh_drawable left_arm;
-	mesh_drawable right_arm;
-	mesh_drawable left_ear;
-	mesh_drawable right_ear;
-	mesh_drawable left_eye;
-	mesh_drawable right_eye;
-	mesh_drawable nose;
-
-	body.initialize_data_on_gpu(mesh_primitive_ellipsoid({0.10f, 0.10f, 0.15f}, {0, 0, 0.1f}));
-	head.initialize_data_on_gpu(mesh_primitive_sphere(0.08f));
-	left_foot.initialize_data_on_gpu(mesh_primitive_ellipsoid({0.07f, 0.03f, 0.03f}, {0, 0, 0}));
-	right_foot.initialize_data_on_gpu(mesh_primitive_ellipsoid({0.07f, 0.03f, 0.03f}, {0, 0, 0}));
-	left_arm.initialize_data_on_gpu(mesh_primitive_ellipsoid({0.025f, 0.025f, 0.04f}, {0, 0, 0}));
-	right_arm.initialize_data_on_gpu(mesh_primitive_ellipsoid({0.025f, 0.025f, 0.04f}, {0, 0, 0}));
-	left_ear.initialize_data_on_gpu(mesh_primitive_ellipsoid({0.02f, 0.015f, 0.07f}, {0, 0, 0}));
-	right_ear.initialize_data_on_gpu(mesh_primitive_ellipsoid({0.02f, 0.015f, 0.07f}, {0, 0, 0}));
-	left_eye.initialize_data_on_gpu(mesh_primitive_sphere(0.01f));
-	right_eye.initialize_data_on_gpu(mesh_primitive_sphere(0.01f));
-	nose.initialize_data_on_gpu(mesh_primitive_triangle({0.0f, -0.01f, 0.005f}, {0.0f, 0.01f, 0.005f}, {0.0f, 0.0f, -0.01f}));
-
-	vec3 white = {1, 1, 1};
-	vec3 black = {0, 0, 0};
-	vec3 red = {0.95f, 0.2f, 0.2f};
-	body.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/Rabbit.png", GL_REPEAT, GL_REPEAT);
-	head.material.color = white;
-	left_foot.material.color = white;
-	right_foot.material.color = white;
-	left_arm.material.color = white;
-	right_arm.material.color = white;
-	left_ear.material.color = white;
-	right_ear.material.color = white;
-	left_eye.material.color = black;
-	right_eye.material.color = black;
-	nose.material.color = red;
-
-	hierarchy.add(body, "body");
-	hierarchy.add(head, "head", "body", {0.0f, 0.0f, 0.26f});
-	hierarchy.add(left_foot, "left foot", "body", {0.05f, 0.05f, 0.0f});
-	hierarchy.add(right_foot, "right foot", "body", {0.05f, -0.05f, 0.0f});
-	hierarchy.add(left_arm, "left arm", "body", {0.09f, 0.05f, 0.13f});
-	hierarchy.add(right_arm, "right arm", "body", {0.09f, -0.05f, 0.13f});
-	hierarchy.add(left_ear, "left ear", "head", {0.0f, 0.035f, 0.1f});
-	hierarchy.add(right_ear, "right ear", "head", {0.0f, -0.035f, 0.1f});
-	hierarchy.add(left_eye, "left eye", "head", {0.055f, 0.035f, 0.04f});
-	hierarchy.add(right_eye, "right eye", "head", {0.055f, -0.035f, 0.04f});
-	hierarchy.add(nose, "nose", "head", {0.076f, 0, 0.028f});
+	hierarchy = bunny();
 
 	// ********************************** //
 	//            Forest scene            //
 	// ********************************** //
 
 	// pine trees
-	mesh pineFoliage_mesh = mesh_load_file_obj("assets/PineFoliage.obj");
-	pineFoliage_mesh.apply_scaling_to_position(20.0f);
+	mesh pineFoliage_mesh = transform(mesh_load_file_obj("assets/PineFoliage.obj"));
 	pineFoliage.initialize_data_on_gpu(pineFoliage_mesh);
 	pineFoliage.material.color = {0.00f, 0.40f, 0.00f};
 	pineFoliage.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture_foliage_tree.jpg", GL_REPEAT, GL_REPEAT);
-	mesh pineTrunks_mesh = mesh_load_file_obj("assets/PineTrunks.obj");
-	pineTrunks_mesh.apply_scaling_to_position(20.0f);
+	mesh pineTrunks_mesh = transform(mesh_load_file_obj("assets/PineTrunks.obj"));
 	pineTrunks.initialize_data_on_gpu(pineTrunks_mesh);
 	pineTrunks.material.color = {0.40f, 0.27f, 0.00f};
 	pineTrunks.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/trunk.jpg", GL_REPEAT, GL_REPEAT);
 
 	// trees
-	mesh treeFoliage_mesh = mesh_load_file_obj("assets/TreeFoliage.obj");
-	treeFoliage_mesh.apply_scaling_to_position(20.0f);
+	mesh treeFoliage_mesh = transform(mesh_load_file_obj("assets/TreeFoliage.obj"));
 	treeFoliage.initialize_data_on_gpu(treeFoliage_mesh);
 	treeFoliage.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture_foliage_tree.jpg", GL_REPEAT, GL_REPEAT);
-	mesh treeTrunks_mesh = mesh_load_file_obj("assets/TreeTrunks.obj");
-	treeTrunks_mesh.apply_scaling_to_position(20.0f);
+	mesh treeTrunks_mesh = transform(mesh_load_file_obj("assets/TreeTrunks.obj"));
 	treeTrunks.initialize_data_on_gpu(treeTrunks_mesh);
 	treeTrunks.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/trunk.jpg", GL_REPEAT, GL_REPEAT);
 
 	// ground and lake
-	mesh ground_mesh = mesh_load_file_obj("assets/Ground.obj");
-	ground_mesh.apply_scaling_to_position(20.0f);
+	mesh ground_mesh = transform(mesh_load_file_obj("assets/Ground.obj"));
 	ground.initialize_data_on_gpu(ground_mesh);
 	ground.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture_grass.png", GL_REPEAT, GL_REPEAT);
-	mesh lake_mesh = mesh_load_file_obj("assets/Lake.obj");
-	lake_mesh.apply_scaling_to_position(20.0f);
+	mesh lake_mesh = transform(mesh_load_file_obj("assets/Lake.obj"));
 	lake.initialize_data_on_gpu(lake_mesh);
 	lake.material.color = {0.60f, 0.80f, 1.00f};
 
-	// house
-	mesh house_mesh = mesh_load_file_obj("assets/House.obj");
-	house_mesh.apply_scaling_to_position(20.0f);
-	house.initialize_data_on_gpu(house_mesh);
-	mesh roof_mesh = mesh_load_file_obj("assets/Roofs.obj");
-	roof_mesh.apply_scaling_to_position(20.0f);
+	// house, well and barrels
+	mesh roof_mesh = transform(mesh_load_file_obj("assets/Roofs.obj"));
 	roof.initialize_data_on_gpu(roof_mesh);
-	roof.material.color = {0.60f,0.00f,0.00f};
-	mesh wood_mesh = mesh_load_file_obj("assets/HouseWood.obj");
-	wood_mesh.apply_scaling_to_position(20.0f);
+	roof.material.color = {0.60f, 0.00f, 0.00f};
+	mesh stone_mesh = transform(mesh_load_file_obj("assets/HouseStones.obj"));
+	stone.initialize_data_on_gpu(stone_mesh);
+	stone.material.color = {0.40f, 0.4f, 0.40f};
+	stone.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture-stone.jpg", GL_REPEAT, GL_REPEAT);
+	mesh wood_mesh = transform(mesh_load_file_obj("assets/HouseWood.obj"));
 	wood.initialize_data_on_gpu(wood_mesh);
-	wood.material.color = {0.40f, 0.27f, 0.00f};
+	wood.material.color = {0.20f, 0.10f, 0.00f};
+	wood.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture-wood2.jpg", GL_REPEAT, GL_REPEAT);
+	mesh barrel_mesh = transform(mesh_load_file_obj("assets/Barrels.obj"));
+	barrel.initialize_data_on_gpu(barrel_mesh);
+	barrel.material.color = {1.00f, 0.90f, 0.70f};
+	barrel.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture-tonneau.png", GL_REPEAT, GL_REPEAT);
+	mesh house_mesh = transform(mesh_load_file_obj("assets/House.obj"));
+	house.initialize_data_on_gpu(house_mesh);
+	house.material.color = {1.00f, 0.93f, 0.80f};
+	house.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture-house.png", GL_REPEAT, GL_REPEAT);
 
+	// original scene made by hand
 
 	/*
 	int N_terrain_samples = 100;
@@ -217,10 +175,11 @@ void scene_structure::display_frame()
 	draw(treeFoliage, environment);
 
 	draw(roof, environment);
+	draw(stone, environment);
+	draw(barrel, environment);
 	draw(wood, environment);
-	draw(house,environment);
+	draw(house, environment);
 
-	/*
 	timer.update();
 
 	// Apply transformation to some elements of the hierarchy
@@ -228,11 +187,14 @@ void scene_structure::display_frame()
 	rotation_transform r_head_anim = rotation_transform::from_axis_angle({0, 1, 0}, 0.25f * cos(2 * timer.t));
 	hierarchy["head"].transform_local.rotation = r_head * r_head_anim;
 	hierarchy.update_local_to_global_coordinates();
-	hierarchy["body"].transform_local.translation = {0,0,evaluate_terrain_height(0,0)};
+	hierarchy["body"].transform_local.scaling = 6;
+	hierarchy["body"].transform_local.translation = {3,1,0};
+	hierarchy["body"].transform_local.rotation = rotation_transform::from_axis_angle({0, 0, 1}, Pi / 2 + Pi / 8);
 
 	draw(hierarchy, environment);
 	// draw(monkey, environment);
 
+	/*
 	draw(terrain, environment);
 
 	for (int i = 0; i < N_trees; i++)

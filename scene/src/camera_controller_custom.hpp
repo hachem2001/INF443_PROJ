@@ -1,7 +1,6 @@
 #pragma once
 
 #include "cgp/cgp.hpp"
-#include "terrain.hpp"
 
 using namespace cgp;
 

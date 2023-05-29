@@ -2,6 +2,8 @@
 
 using namespace cgp;
 
+float camera_height=2.0f+1.5f;
+
 
 void camera_controller_custom::update(mat4& camera_matrix_view) {
 	camera_matrix_view = camera_model.matrix_view();
@@ -92,16 +94,16 @@ void camera_controller_custom::idle_frame(mat4& camera_matrix_view)
 	if (inputs->keyboard.ctrl == false) {
 		if (inputs->keyboard.up)
 			camera_model.manipulator_translate_in_plane({ 0,-6*magnitude });
-			camera_model.position_camera[2]=evaluate_terrain_height(camera_model.position_camera[0],camera_model.position_camera[1])+1.5f;
+			camera_model.position_camera[2]=camera_height;
 		if (inputs->keyboard.down)
 			camera_model.manipulator_translate_in_plane({ 0, 6*magnitude });
-			camera_model.position_camera[2]=evaluate_terrain_height(camera_model.position_camera[0],camera_model.position_camera[1])+1.5f;
+			camera_model.position_camera[2]=camera_height;
 		if (inputs->keyboard.left)
 			camera_model.manipulator_translate_in_plane({ 6*magnitude ,0 });
-			camera_model.position_camera[2]=evaluate_terrain_height(camera_model.position_camera[0],camera_model.position_camera[1])+1.5f;
+			camera_model.position_camera[2]=camera_height;
 		if (inputs->keyboard.right)
 			camera_model.manipulator_translate_in_plane({ -6*magnitude ,0 });
-			camera_model.position_camera[2]=evaluate_terrain_height(camera_model.position_camera[0],camera_model.position_camera[1])+1.5f;
+			camera_model.position_camera[2]=camera_height;
 	}
 	else {
 		if (inputs->keyboard.up)
