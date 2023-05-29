@@ -6,10 +6,22 @@
 #include "cgp/graphics/opengl/opengl.hpp"
 //#include <glm/glm.hpp>
 
+#include <random>
+#include "time.h"
+#include <cmath>
+
 using namespace cgp;
+
+typedef std::mt19937 MyRNG;  // the Mersenne Twister with a popular choice of parameters
+MyRNG rng; // Random number generator
+
+std::uniform_real_distribution<float> uflt_dist10(0,10);
 
 void scene_structure::initialize()
 {
+	rng.seed(time(NULL)); // Set random seed
+
+
 	// Basic set-up
 	// ***************************************** //
 	camera_control.initialize(inputs, window); // Give access to the inputs and window global state to the camera controler
@@ -31,7 +43,7 @@ void scene_structure::initialize()
 
 
 	player.initialize_data_on_gpu(mesh_primitive_tetrahedron());
-	player.model.translation = camera_control.camera_model.position();
+	player.model.translation = vec3(5.f, 0.f, 0.f) + vec3(uflt_dist10(rng), uflt_dist10(rng), uflt_dist10(rng) ) ;// camera_control.camera_model.position();
 	// room 1
 	room1 = new room(room1_length, room_depth, room_height, {0,0,0});
 
@@ -105,8 +117,13 @@ void scene_structure::initialize()
 	// portal21 = room2->get_portal_1();
 	// portal23 = room2->get_portal_2();
 
-	room1->get_portal_1()->link_portals(*room2->get_portal_1());
-	room1->get_portal_2()->link_portals(*room2->get_portal_2());
+	room1->get_portal_1()->link_portals(*room2->get_portal_2());
+	room1->get_portal_2()->link_portals(*room2->get_portal_1());
+
+	// cgp::rotation_transform a = cgp::rotation_transform::from_axis_angle({0.f, 0.f, 1.f}, 0);
+    // cgp::affine_rt b = cgp::rotation_around_center(a, {0.f, 0.f, 0.f});
+
+    // room1->get_portal_1()->portal_mesh_drawable.model = cgp::affine_rt(a, room1->get_portal_1()->position_of_center);
 }
 
 
@@ -115,7 +132,7 @@ void scene_structure::display_frame()
 	// Set the light to the current position of the camera
 	// Set the recursion counts to every portal to 2.
 
-	player.model.translation = camera_control.camera_model.position();
+	//player.model.translation = camera_control.camera_model.position();
 	environment.light = camera_control.camera_model.position();
 	
 	if (gui.display_frame)
@@ -137,12 +154,14 @@ void scene_structure::display_frame()
 	draw(portal41, environment);
 	*/
 	//draw(room1->room_mesh_drawable, environment);
-	room1->draw(environment);
-	room2->draw(environment);
-	//draw(player, environment);
-
 	mat4 camera_projection_m = camera_projection.matrix();
 
+
+	room1->draw(environment);
+	room2->draw(environment);
+	draw(player, environment);
+
+	//glClear(GL_DEPTH_BUFFER_BIT);
 	room1->first_portal.draw_begin(camera_control.camera_model, camera_projection_m, environment);
 	display_frame_from_portal(room1->first_portal);
 	room1->first_portal.draw_end(camera_control.camera_model,camera_projection_m, environment);
@@ -158,6 +177,7 @@ void scene_structure::display_frame()
 	room2->second_portal.draw_begin(camera_control.camera_model,camera_projection_m, environment);
 	display_frame_from_portal(room1->first_portal);
 	room2->second_portal.draw_end(camera_control.camera_model,camera_projection_m, environment);
+
 
 	if (gui.display_wireframe){
 		/*
@@ -184,14 +204,20 @@ void scene_structure::display_frame_from_portal(portal& portal)
 	// This function is supposed to do basically the same thing as what is shown before, except it doesn't bother showing anything
 	// that is outside the view of the portal. Well, I didn't bother tbh...
 	
+	vec3 const& background_color = environment.background_color;
+	glClearColor(background_color.x, background_color.y, background_color.z, 1.0f);
+
+    // now draw the portal object again
 
 	// POUR LINSTANT : RIEN DE RECURSIF. Chuis pas assez fort pour ça.
 	if (portal.linked) {
 		room1->draw(environment);
 		room2->draw(environment);
-		//draw(player, environment);
+		draw(player, environment);
 	}
 	//display_frame();
+
+	// and reset what you changed so the rest of the code works
 }
 
 void scene_structure::display_gui()
@@ -216,4 +242,12 @@ void scene_structure::keyboard_event()
 void scene_structure::idle_frame()
 {
 	camera_control.idle_frame(environment.camera_view);
+	// Go through all the portals and check for portal intesection.
+	// std::cout << "Before : " << camera_control.before_pos << std::endl;
+	// std::cout << "After : " << camera_control.after_pos << std::endl;
+	
+	bool portal_int_1 = portal_intersection(camera_control.before_pos, camera_control.after_pos, *room1->get_portal_1());
+	if (portal_int_1) {
+		std::cout << "True!" << std::endl;
+	}
 }

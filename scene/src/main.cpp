@@ -10,8 +10,6 @@
 #include "scene.hpp"
 
 
-
-
 // *************************** //
 // Custom Scene defined in "scene.hpp"
 // *************************** //
@@ -33,7 +31,6 @@ timer_fps fps_record;
 int main(int, char* argv[])
 {
 	std::cout << "Run " << argv[0] << std::endl;
-
 	
 
 	// ************************ //

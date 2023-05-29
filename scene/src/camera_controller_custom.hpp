@@ -8,6 +8,9 @@ struct camera_controller_custom : camera_controller_generic_base
 {
 	camera_first_person_euler camera_model;
 
+	vec3 before_pos;
+	vec3 after_pos;
+
 	/// @brief Sets rotation axis of camera to z up.
 	void set_rotation_axis_z();
 

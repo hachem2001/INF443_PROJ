@@ -64,31 +64,25 @@ void camera_controller_custom::idle_frame(mat4& camera_matrix_view)
 
 	float const magnitude = 2 * inputs->time_interval;
 
+	vec3 before_position = camera_model.position();
+
 	// displacement with WSAD
 	if (inputs->keyboard.is_pressed(GLFW_KEY_R))
 		camera_model.manipulator_translate_in_plane({ 0,-magnitude });
 	if (inputs->keyboard.is_pressed(GLFW_KEY_F))
 		camera_model.manipulator_translate_in_plane({ 0, magnitude });
 	if (inputs->keyboard.is_pressed(GLFW_KEY_A)) {
-		//camera_model.position_camera += vec3{-magnitude, 0, 0};
 		camera_model.manipulator_translate_in_plane({ magnitude ,0 });
 	}
 	if (inputs->keyboard.is_pressed(GLFW_KEY_D)) {
-		//camera_model.position_camera += vec3{magnitude, 0, 0};
-
 		camera_model.manipulator_translate_in_plane({ -magnitude ,0 });
 }
-	if (inputs->keyboard.is_pressed(GLFW_KEY_W)) {
-		//camera_model.position_camera += vec3{0, magnitude, 0};
-	
+	if (inputs->keyboard.is_pressed(GLFW_KEY_W)) {	
 		camera_model.manipulator_translate_front(-magnitude);
 	}
 	if (inputs->keyboard.is_pressed(GLFW_KEY_S)) {
-		//camera_model.position_camera += vec3{0, -magnitude, 0};
-
 		camera_model.manipulator_translate_front(magnitude);
 	}
-	// with arrows:
 	if (inputs->keyboard.ctrl == false) {
 		if (inputs->keyboard.up)
 			camera_model.manipulator_translate_in_plane({ 0,-magnitude });
@@ -106,6 +100,10 @@ void camera_controller_custom::idle_frame(mat4& camera_matrix_view)
 			camera_model.manipulator_translate_front(magnitude);
 	}
 
+	vec3 after_position = camera_model.position();
+
+	before_pos = before_position;
+	after_pos = after_position;
 
 	update(camera_matrix_view);
 }

@@ -32,7 +32,7 @@ public:
     ///@param room_height the height of the portal
     ///@param position The position of the portal
     /// I will probably add "normal" next. Because it's _VERY_ useful to have for portals
-    portal(float room_height, cgp::vec3 position);
+    portal(float room_height, cgp::vec3 position, float rotation = 180.f);
     
     ///@brief Link two portals together
     ///@param portal1 first portal to link
@@ -60,3 +60,4 @@ public:
 };
 
 cgp::mesh create_portal_mesh(float room_height);
+bool portal_intersection(cgp::vec3 la, cgp::vec3 lb, portal& portal);
