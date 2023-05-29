@@ -2,7 +2,7 @@
 
 using namespace cgp;
 
-float camera_height=2.0f+1.5f;
+float camera_height=1.0f;
 
 
 void camera_controller_custom::update(mat4& camera_matrix_view) {
@@ -73,36 +73,36 @@ void camera_controller_custom::idle_frame(mat4& camera_matrix_view)
 		camera_model.manipulator_translate_in_plane({ 0, magnitude });
 	if (inputs->keyboard.is_pressed(GLFW_KEY_A)) {
 		//camera_model.position_camera += vec3{-magnitude, 0, 0};
-		camera_model.manipulator_translate_in_plane({ 6*magnitude ,0 });
+		camera_model.manipulator_translate_in_plane({ 1.5f*magnitude ,0 });
 	}
 	if (inputs->keyboard.is_pressed(GLFW_KEY_D)) {
 		//camera_model.position_camera += vec3{magnitude, 0, 0};
 
-		camera_model.manipulator_translate_in_plane({ -6*magnitude ,0 });
+		camera_model.manipulator_translate_in_plane({ -1.5f*magnitude ,0 });
 }
 	if (inputs->keyboard.is_pressed(GLFW_KEY_W)) {
 		//camera_model.position_camera += vec3{0, magnitude, 0};
 	
-		camera_model.manipulator_translate_front(-6*magnitude);
+		camera_model.manipulator_translate_front(-1.5f*magnitude);
 	}
 	if (inputs->keyboard.is_pressed(GLFW_KEY_S)) {
 		//camera_model.position_camera += vec3{0, -magnitude, 0};
 
-		camera_model.manipulator_translate_front(6*magnitude);
+		camera_model.manipulator_translate_front(1.5f*magnitude);
 	}
 	// with arrows:
 	if (inputs->keyboard.ctrl == false) {
 		if (inputs->keyboard.up)
-			camera_model.manipulator_translate_in_plane({ 0,-6*magnitude });
+			camera_model.manipulator_translate_in_plane({ 0,-magnitude });
 			camera_model.position_camera[2]=camera_height;
 		if (inputs->keyboard.down)
-			camera_model.manipulator_translate_in_plane({ 0, 6*magnitude });
+			camera_model.manipulator_translate_in_plane({ 0, magnitude });
 			camera_model.position_camera[2]=camera_height;
 		if (inputs->keyboard.left)
-			camera_model.manipulator_translate_in_plane({ 6*magnitude ,0 });
+			camera_model.manipulator_translate_in_plane({ magnitude ,0 });
 			camera_model.position_camera[2]=camera_height;
 		if (inputs->keyboard.right)
-			camera_model.manipulator_translate_in_plane({ -6*magnitude ,0 });
+			camera_model.manipulator_translate_in_plane({ -magnitude ,0 });
 			camera_model.position_camera[2]=camera_height;
 	}
 	else {
