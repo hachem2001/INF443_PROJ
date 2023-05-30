@@ -367,13 +367,8 @@ void scene_structure::keyboard_event()
 {
 	camera_control.action_keyboard(environment.camera_view);
 }
-void scene_structure::idle_frame()
-{
-	camera_control.idle_frame(environment.camera_view);
-	// Go through all the portals and check for portal intesection.
-	// std::cout << "Before : " << camera_control.before_pos << std::endl;
-	// std::cout << "After : " << camera_control.after_pos << std::endl;
-	
+
+void scene_structure::update_camera_teleportation_through_portal() {
 	for (int i=0; i<portals_to_draw.size(); i++) {
 		if (portals_to_draw[i]->linked) {
 			bool portal_int = portal_intersection(camera_control.before_pos, camera_control.after_pos, *portals_to_draw[i]);
@@ -383,23 +378,23 @@ void scene_structure::idle_frame()
 				std::pair<glm::mat4, cgp::mat4> p = portals_to_draw[i]->get_portal_view(cv, cf);
 				cgp::mat4 frame_after_mv = cgp::inverse(p.second);
 
-//				camera_control.camera_model.position_camera = camera_control.before_pos + portals_to_draw[i]->connected_portal->position_of_center - portals_to_draw[i]->position_of_center;
-
-
-				//camera_control.camera_model.
-				camera_control.camera_model.position_camera = frame_after_mv.col_w_vec3();
-				
-				// frame_after_mv.set_translation({0.f, 0.f, 0.f});
-
-//				camera_control.camera_model.pitch = 
-
-
-				// camera_control.camera_model.pitch=atan2(frame_after_mv[2][0], frame_after_mv[2][1]);
-				// camera_control.camera_model.roll=acos(frame_after_mv[2][2]);
-				// camera_control.camera_model.yaw=-atan2(frame_after_mv[0][2], frame_after_mv[1][2]);
-
-				camera_control.camera_model.look_at(cgp::inverse(p.second).col_w_vec3() + cgp::inverse(p.second).apply_to_vec3_vector(camera_control.after_pos-camera_control.before_pos), cgp::inverse(p.second).col_w_vec3() - cgp::inverse(p.second).apply_to_vec3_vector({0.f, 0.f, 1.f}));
+				camera_control.camera_model.look_at(cgp::inverse(p.second).col_w_vec3() + 0.001 * cgp::inverse(p.second).apply_to_vec3_vector({0.f, 0.f, 1.f}) , cgp::inverse(p.second).col_w_vec3() - cgp::inverse(p.second).apply_to_vec3_vector({0.f, 0.f, 1.f}));
+				//display_frame();
+				return;
 			}
 		}
 	}
+}
+
+
+
+void scene_structure::idle_frame()
+{
+	// Go through all the portals and check for portal intesection.
+	// std::cout << "Before : " << camera_control.before_pos << std::endl;
+	// std::cout << "After : " << camera_control.after_pos << std::endl;
+	
+
+	camera_control.idle_frame(environment.camera_view);
+	update_camera_teleportation_through_portal();
 }

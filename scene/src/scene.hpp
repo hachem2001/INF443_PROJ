@@ -98,6 +98,8 @@ struct scene_structure : cgp::scene_inputs_generic {
 	void display_portals_recursion(cgp::mat4 view_m, cgp::mat4 proj_m, int recursion_level); // Display the scene from a portal's point of view.
 	void display_gui();   // The display of the GUI, also called within the animation loop
 
+	void update_camera_teleportation_through_portal();
+
 	void mouse_move_event();
 	void mouse_click_event();
 	void keyboard_event();
