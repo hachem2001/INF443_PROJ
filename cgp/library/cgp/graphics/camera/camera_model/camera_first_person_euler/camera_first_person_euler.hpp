@@ -35,6 +35,9 @@ namespace cgp
 		void manipulator_translate_in_plane(vec2 const& tr);
 		void manipulator_translate_front(float magnitude);
 
+		// void set_matrix_view(mat4 vm); // ADDED BY USER
+		// void set_matrix_frame(mat4 fm); // ADDED BY USER
+
 		// Change the rotation axis
 		void set_rotation_axis(vec3 axis);
 

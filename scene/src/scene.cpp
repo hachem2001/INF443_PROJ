@@ -120,10 +120,10 @@ void scene_structure::initialize()
 	room1->get_portal_1()->link_portals(*room2->get_portal_2());
 	room1->get_portal_2()->link_portals(*room2->get_portal_1());
 
-	// cgp::rotation_transform a = cgp::rotation_transform::from_axis_angle({0.f, 0.f, 1.f}, 0);
-    // cgp::affine_rt b = cgp::rotation_around_center(a, {0.f, 0.f, 0.f});
+	cgp::rotation_transform a = cgp::rotation_transform::from_axis_angle({0.f, 0.f, 1.f}, 0);
+	cgp::affine_rt b = cgp::rotation_around_center(a, {0.f, 0.f, 0.f});
 
-    // room1->get_portal_1()->portal_mesh_drawable.model = cgp::affine_rt(a, room1->get_portal_1()->position_of_center);
+	room1->get_portal_1()->portal_mesh_drawable.model = cgp::affine_rt(a, room1->get_portal_1()->position_of_center);
 
 	portals_to_draw.push_back(room1->get_portal_1());
 	portals_to_draw.push_back(room1->get_portal_2());
@@ -151,7 +151,8 @@ void scene_structure::display_frame()
 void scene_structure::set_view_m(cgp::mat4& view_m)
 {
 	environment.camera_view = view_m;
-	// MAYBE ALSO SET LIGHT OT VIEW M POSITION HERE??
+	environment.light = cgp::inverse(view_m).col_w_vec3(); // MAYBE ALSO SET LIGHT OT VIEW M POSITION HERE??
+	
 }
 
 void scene_structure::set_proj_m(cgp::mat4& proj_m)
@@ -189,6 +190,7 @@ void scene_structure::display_portals_recursion(cgp::mat4 view_m, cgp::mat4 proj
 		if (! portals_to_draw[i]->linked)
 			continue;
 
+		/*
         glEnable(GL_STENCIL_TEST);
         // Everything happens in-between
         
@@ -196,6 +198,28 @@ void scene_structure::display_portals_recursion(cgp::mat4 view_m, cgp::mat4 proj
         glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP); // Stencil options and parameters
         glStencilMask(0XEF); // To clip anything not seen
         glClear(GL_STENCIL_BUFFER_BIT);
+		*/
+
+		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+		glDepthMask(GL_FALSE);
+
+		// Disable depth test
+		glDisable(GL_DEPTH_TEST);
+
+		// Enable stencil test, to prevent drawing outside
+		// region of current portal depth
+		glEnable(GL_STENCIL_TEST);
+
+		// Fail stencil test when inside of outer portal
+		// (fail where we should be drawing the inner portal)
+		glStencilFunc(GL_NOTEQUAL, recursion_level, 0xFF);
+
+		// Increment stencil value on stencil fail
+		// (on area of inner portal)
+		glStencilOp(GL_INCR, GL_KEEP, GL_KEEP);
+
+		// Enable (writing into) all stencil bits
+		glStencilMask(0xFF);
 
         // BEGIN DRAW STENCIl
         //cgp::draw(portal_mesh_drawable, environment);
@@ -203,67 +227,123 @@ void scene_structure::display_portals_recursion(cgp::mat4 view_m, cgp::mat4 proj
 		set_proj_m(proj_m);
 		portals_to_draw[i]->draw_stencil(environment);
         // END DRAW STENCIL
-        
+		
+		cgp::mat4 fm = cgp::inverse(view_m);
+		std::pair<glm::mat4, cgp::mat4> p = portals_to_draw[i]->get_portal_view(view_m, fm);
+	
+        glm::mat4 proj_clipped = portals_to_draw[i]->clippedProjMat(p.first, convert_cgp_to_glm_mat4(proj_m));
+		cgp::mat4 proj_clipped_cgp = convert_glm_to_cgp_mat4(proj_clipped);
+
+
+		if (recursion_level == max_recursion_level) {
+			glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+			glDepthMask(GL_TRUE);
+			
+			// Clear the depth buffer so we don't interfere with stuff
+			// outside of this inner portal
+			glClear(GL_DEPTH_BUFFER_BIT);
+
+			// Enable the depth test
+			// So the stuff we render here is rendered correctly
+			glEnable(GL_DEPTH_TEST);
+
+			// Enable stencil test
+			// So we can limit drawing inside of the inner portal
+			glEnable(GL_STENCIL_TEST);
+
+			// Disable drawing into stencil buffer
+			glStencilMask(0x00);
+
+			// Draw only where stencil value == recursionLevel + 1
+			// which is where we just drew the new portal
+			glStencilFunc(GL_EQUAL, recursion_level + 1, 0xFF);
+
+			// Draw scene objects with destView, limited to stencil buffer
+			// use an edited projection matrix to set the near plane to the portal plane
+			draw_non_portal(p.second, proj_clipped_cgp);
+			//drawNonPortals(destView, projMat);
+		} else {
+			display_portals_recursion(p.second, proj_clipped_cgp, recursion_level+1);
+		}
+		/*
         glClear(GL_DEPTH_BUFFER_BIT);
         // THe stencil mask!
         glStencilMask(0x00);
         glStencilFunc(GL_EQUAL, 1, 0xFF);
-
-		cgp::mat4 fm = cgp::inverse(view_m);
-		std::pair<glm::mat4, cgp::mat4> p = portals_to_draw[i]->get_portal_view(view_m, fm);
-
-        glm::mat4 proj_clipped = portals_to_draw[i]->clippedProjMat(p.first, convert_cgp_to_glm_mat4(proj_m));
-		cgp::mat4 proj_clipped_cgp = convert_glm_to_cgp_mat4(proj_clipped);
+		
 
 		draw_non_portal(p.second, proj_clipped_cgp);
 		
 		glDisable(GL_STENCIL_TEST);
+		*/
+
+		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+		glDepthMask(GL_FALSE);
+
+		// Enable stencil test and stencil drawing
+		glEnable(GL_STENCIL_TEST);
+		glStencilMask(0xFF);
+
+		// Fail stencil test when inside of our newly rendered
+		// inner portal
+		glStencilFunc(GL_NOTEQUAL, recursion_level + 1, 0xFF);
+
+		// Decrement stencil value on stencil fail
+		// This resets the incremented values to what they were before,
+		// eventually ending up with a stencil buffer full of zero's again
+		// after the last (outer) step.
+		glStencilOp(GL_DECR, GL_KEEP, GL_KEEP);
+
+		// Draw portal into stencil buffer
+		set_view_m(view_m);
+		set_proj_m(proj_m);
+		portals_to_draw[i]->draw_stencil(environment);
 	}
 	
-	// Disable the stencil test and stencil writing
-	// glDisable(GL_STENCIL_TEST);
-	// glStencilMask(0x00);
+	//Disable the stencil test and stencil writing
+	glDisable(GL_STENCIL_TEST);
+	glStencilMask(0x00);
 
-	// // Disable color writing
-	// glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+	// Disable color writing
+	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
-	// // Enable the depth test, and depth writing.
-	// glEnable(GL_DEPTH_TEST);
-	// glDepthMask(GL_TRUE);
+	// Enable the depth test, and depth writing.
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
 
-	// // Make sure we always write the data into the buffer
-	// glDepthFunc(GL_ALWAYS);
+	// Make sure we always write the data into the buffer
+	glDepthFunc(GL_ALWAYS);
 
-	// // Clear the depth buffer
-	// glClear(GL_DEPTH_BUFFER_BIT);
+	// Clear the depth buffer
+	glClear(GL_DEPTH_BUFFER_BIT);
 
-	// // Draw portals into depth buffer
-	// set_view_m(view_m);
-	// set_proj_m(proj_m);
-	// for (int i=0; i<portals_to_draw.size(); i++) {
-	// 	if (!portals_to_draw[i]->linked) 
-	// 		continue;
-	// 	portals_to_draw[i]->draw_stencil(environment);
-	// }
+	// Draw portals into depth buffer
+	set_view_m(view_m);
+	set_proj_m(proj_m);
+	for (int i=0; i<portals_to_draw.size(); i++) {
+		if (!portals_to_draw[i]->linked) 
+			continue;
+		portals_to_draw[i]->draw_stencil(environment);
+	}
 	
-	// // Reset the depth function to the default
-	// glDepthFunc(GL_LESS);
+	// Reset the depth function to the default
+	glDepthFunc(GL_LESS);
 
-	// // Enable stencil test and disable writing to stencil buffer
-	// glEnable(GL_STENCIL_TEST);
-	// glStencilMask(0x00);
+	// Enable stencil test and disable writing to stencil buffer
+	glEnable(GL_STENCIL_TEST);
+	glStencilMask(0x00);
 
-	// // Draw at stencil >= recursionlevel
-	// // which is at the current level or higher (more to the inside)
-	// // This basically prevents drawing on the outside of this level.
-	// glStencilFunc(GL_LEQUAL, recursion_level, 0xFF);
+	// Draw at stencil >= recursionlevel
+	// which is at the current level or higher (more to the inside)
+	// This basically prevents drawing on the outside of this level.
+	glStencilFunc(GL_LEQUAL, recursion_level, 0xFF);
 
-	// // Enable color and depth drawing again
-	// glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-	// glDepthMask(GL_TRUE);
+	// Enable color and depth drawing again
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	glDepthMask(GL_TRUE);
 
-	// // And enable the depth test
-	// glEnable(GL_DEPTH_TEST);
+	// And enable the depth test
+	glEnable(GL_DEPTH_TEST);
 	draw_non_portal(view_m, proj_m);
 
 }
@@ -294,8 +374,32 @@ void scene_structure::idle_frame()
 	// std::cout << "Before : " << camera_control.before_pos << std::endl;
 	// std::cout << "After : " << camera_control.after_pos << std::endl;
 	
-	bool portal_int_1 = portal_intersection(camera_control.before_pos, camera_control.after_pos, *room1->get_portal_1());
-	if (portal_int_1) {
-		std::cout << "True!" << std::endl;
+	for (int i=0; i<portals_to_draw.size(); i++) {
+		if (portals_to_draw[i]->linked) {
+			bool portal_int = portal_intersection(camera_control.before_pos, camera_control.after_pos, *portals_to_draw[i]);
+			if (portal_int) {
+				std::cout << "True!" << std::endl;
+				cgp::mat4 cv = camera_control.camera_model.matrix_view(), cf = camera_control.camera_model.matrix_frame();
+				std::pair<glm::mat4, cgp::mat4> p = portals_to_draw[i]->get_portal_view(cv, cf);
+				cgp::mat4 frame_after_mv = cgp::inverse(p.second);
+
+//				camera_control.camera_model.position_camera = camera_control.before_pos + portals_to_draw[i]->connected_portal->position_of_center - portals_to_draw[i]->position_of_center;
+
+
+				//camera_control.camera_model.
+				camera_control.camera_model.position_camera = frame_after_mv.col_w_vec3();
+				
+				// frame_after_mv.set_translation({0.f, 0.f, 0.f});
+
+//				camera_control.camera_model.pitch = 
+
+
+				// camera_control.camera_model.pitch=atan2(frame_after_mv[2][0], frame_after_mv[2][1]);
+				// camera_control.camera_model.roll=acos(frame_after_mv[2][2]);
+				// camera_control.camera_model.yaw=-atan2(frame_after_mv[0][2], frame_after_mv[1][2]);
+
+				camera_control.camera_model.look_at(cgp::inverse(p.second).col_w_vec3() + cgp::inverse(p.second).apply_to_vec3_vector(camera_control.after_pos-camera_control.before_pos), cgp::inverse(p.second).col_w_vec3() - cgp::inverse(p.second).apply_to_vec3_vector({0.f, 0.f, 1.f}));
+			}
+		}
 	}
 }

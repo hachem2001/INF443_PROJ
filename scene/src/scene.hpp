@@ -30,7 +30,7 @@ struct scene_structure : cgp::scene_inputs_generic {
 	// Elements and shapes of the scene
 	// ****************************** //
 
-	int max_recursion_level = 1;
+	int max_recursion_level = 0;
 
 	camera_controller_custom camera_control;
 	camera_projection_perspective camera_projection;

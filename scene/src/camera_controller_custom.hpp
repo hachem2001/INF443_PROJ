@@ -14,6 +14,8 @@ struct camera_controller_custom : camera_controller_generic_base
 	/// @brief Sets rotation axis of camera to z up.
 	void set_rotation_axis_z();
 
+	void set_position(vec3 position);
+
 	/// @brief Update camera rotation when the mouse moves.
 	/// @param camera_matrix_view 
 	void action_mouse_move(mat4& camera_matrix_view);

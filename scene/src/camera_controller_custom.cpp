@@ -112,3 +112,8 @@ void camera_controller_custom::set_rotation_axis_z()
 {
 	camera_model.set_rotation_axis({0,0,1});
 }
+
+void camera_controller_custom::set_position(vec3 position)
+{
+	camera_model.position_camera = position;
+}

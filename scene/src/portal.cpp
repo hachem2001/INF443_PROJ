@@ -97,6 +97,7 @@ glm::mat4 const portal::clippedProjMat(glm::mat4 const& viewMat, glm::mat4 const
  */
 
 bool portal_intersection(cgp::vec3 la, cgp::vec3 lb, portal& portal) {
+    static float threshhold = 1e-9;
     if ((la-lb).x != 0.0f || (la-lb).y != 0.0f || (la-lb).z != 0.0f) {  // camera moved
         // Check for intersection with each of the portal's 2 front triangles
         for (int i = 0; i < 2; i++) {
@@ -122,18 +123,21 @@ bool portal_intersection(cgp::vec3 la, cgp::vec3 lb, portal& portal) {
                     glm::vec3(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z),
                     glm::vec3(p2.x - p0.x, p2.y - p0.y, p2.z - p0.z)))
                 * glm::vec3(la.x - p0.x, la.y - p0.y, la.z - p0.z);
+            
             glm::vec3 tuv2 =
                 glm::inverse(glm::mat3(glm::vec3(la.x - lb.x, la.y - lb.y, la.z - lb.z),
-                    glm::vec3(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z),
-                    glm::vec3(p2.x - p0.x, p2.y - p0.y, p2.z - p0.z)))
-                * glm::vec3(la.x - p0.x, la.y - p0.y, la.z - p0.z);
+                    glm::vec3(p1.x - p3.x, p1.y - p3.y, p1.z - p3.z),
+                    glm::vec3(p2.x - p3.x, p2.y - p3.y, p2.z - p3.z)))
+                * glm::vec3(la.x - p3.x, la.y - p3.y, la.z - p3.z);
+            
             float t = tuv.x, u = tuv.y, v = tuv.z;
-            float t2 = tuv.x, u2 = tuv.y, v2 = tuv.z;
+            float t2 = tuv2.x, u2 = tuv2.y, v2 = tuv2.z;
 
             // intersection with the plane
-            if (t >= 0 - 1e-6 && t <= 1 + 1e-6) {
+            if ((t >= 0 - threshhold && t <= 1 + threshhold) || (t2 >= 0 - threshhold && t2 <= 1 + threshhold)) {
                 // intersection with the triangle
-                if ((u >= 0 - 1e-6 && u <= 1 + 1e-6 && v >= 0 - 1e-6 && v <= 1 + 1e-6 && (u + v) <= 1 + 1e-6) || (u2 >= 0 - 1e-6 && u2 <= 1 + 1e-6 && v2 >= 0 - 1e-6 && v2 <= 1 + 1e-6 && (u2 + v2) <= 1 + 1e-6)) {
+                
+                if ((u >= 0 - threshhold && u <= 1 + threshhold && v >= 0 - threshhold && v <= 1 + threshhold && (u + v) <= 1 + threshhold) || (u2 >= 0 - threshhold && u2 <= 1 + threshhold && v2 >= 0 - threshhold && v2 <= 1 + threshhold && (u2 + v2) <= 1 + threshhold)) {
                     return true;
                 }
             }

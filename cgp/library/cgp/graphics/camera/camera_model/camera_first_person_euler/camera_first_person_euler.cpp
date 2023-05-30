@@ -38,6 +38,16 @@ namespace cgp
 	{
 		position_camera -= magnitude * front();
 	}
+	
+	// void camera_first_person_euler::set_matrix_view(mat4 vm)
+	// {
+		
+	// }
+	
+	// void camera_first_person_euler::set_matrix_frame(mat4 fm)
+	// {
+		
+	// }
 
 	void camera_first_person_euler::set_rotation_axis(vec3 axis)
 	{
