@@ -7,6 +7,11 @@ mesh create_ground_mesh(float room_length, float room_depth)
     return mesh_primitive_quadrangle({0, 0.0f, 0.0f}, {room_length, 0.0f, 0.0f}, {room_length, room_depth, 0}, {0, room_depth, 0.0f});
 }
 
+mesh create_roof_mesh(float room_length, float room_depth, float room_height)
+{
+    return mesh_primitive_quadrangle({0, 0.0f, room_height}, {room_length, 0.0f, room_height}, {room_length, room_depth, room_height}, {0, room_depth, room_height});
+}
+
 mesh create_room_mesh(float room_length, float room_depth, float room_height)
 {
     mesh m;
