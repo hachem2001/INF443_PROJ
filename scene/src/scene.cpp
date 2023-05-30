@@ -10,12 +10,17 @@
 #include "time.h"
 #include <cmath>
 
+
+#include "nature.hpp"
+#include "monkey.hpp"
+#include "scene_mesh.hpp"
+
 using namespace cgp;
 
 typedef std::mt19937 MyRNG;  // the Mersenne Twister with a popular choice of parameters
 MyRNG rng; // Random number generator
 
-std::uniform_real_distribution<float> uflt_dist10(0,10);
+std::uniform_real_distribution<float> uflt_dist10(0, 10);
 
 void scene_structure::initialize()
 {
@@ -26,109 +31,149 @@ void scene_structure::initialize()
 	// ***************************************** //
 	camera_control.initialize(inputs, window); // Give access to the inputs and window global state to the camera controler
 	camera_control.set_rotation_axis_z();
-	camera_control.camera_model.set_rotation_axis({0.0f, 0.0f, 1.0f});
-	camera_control.camera_model.look_at({ 15.0f,6.0f,6.0f }, {0,0,0});
+	camera_control.camera_model.set_rotation_axis({ 0.0f, 0.0f, 1.0f });
+	camera_control.camera_model.look_at({ 15.0f,6.0f,6.0f }, { 0,0,0 });
 	global_frame.initialize_data_on_gpu(mesh_primitive_frame());
 
-	// ***************************************** //
-	// Set-up 4 rooms
-	// ***************************************** //
 
-	float room1_length = 5.0f; //more than 4.0f
-	float room2_length = 10.0f; // more than 4.0f
-	float room3_length = 4.0f; // more than 4.0f
-	float room4_length = 8.0f; // more than 4.0f
-	float room_depth = 2.0f;
-	float room_height = 2.0f;
+	// ADDED BY GALLE
+	{
 
 
-	player.initialize_data_on_gpu(mesh_primitive_tetrahedron());
-	player.model.translation = vec3(5.f, 0.f, 0.f) + vec3(uflt_dist10(rng), uflt_dist10(rng), uflt_dist10(rng) ) ;// camera_control.camera_model.position();
-	// room 1
-	room1 = new room(room1_length, room_depth, room_height, {0,0,0});
 
-	room1->room_mesh_drawable.material.color = { 0.6f,0.85f,0.5f };
-	room1->room_mesh_drawable.material.phong.specular = 0.0f;
+		// ********************************** //
+		//               Rooms                //
+		// ********************************** //
 
-	//room 2
-	room2 = new room(room2_length, room_depth, room_height, {room2_length+0.5f, room_depth+0.5f, 0.0f}, M_PI_2);
+		float room_length = 5.0f;
+		float room_depth = 2.0f;
+		float room_height = 2.0f;
 
-	room2->room_mesh_drawable.material.color = { 0.5f,0.5f,0.7f };
-	room2->room_mesh_drawable.material.phong.specular = 0.0f;
+		mesh room1_mesh = create_room_mesh(room_length, room_depth, room_height);
+		room1_mesh.apply_translation_to_position({ 1.0f, -room_depth - 1.0f, 0 });
+		room1.initialize_data_on_gpu(room1_mesh);
 
-	/*
-	// room 3
-	mesh room3_mesh = create_room_mesh(room3_length, room_depth, room_height);
-	room3_mesh.apply_translation_to_position({room1_length+room2_length+2.0f, 0, 0});
-	room3.initialize_data_on_gpu(room3_mesh);
-	
-	room3.material.color = { 0.7f,0.5f,0.5f };
-	room3.material.phong.specular = 0.0f; // non-specular terrain material
+		room1.material.color = { 0.6f, 0.85f, 0.5f };
+		room1.material.phong.specular = 0.0f; // non-specular terrain material
 
-	// room 4
-	mesh room4_mesh = create_room_mesh(room4_length, room_depth, room_height);
-	room4_mesh.apply_translation_to_position({room1_length+room2_length+room3_length+3.0f, 0, 0});
-	room4.initialize_data_on_gpu(room4_mesh);
-	
-	room4.material.color = { 0.5f,0.5f,0.5f };
-	room4.material.phong.specular = 0.0f; // non-specular terrain material
-	*/
+		mesh room2_mesh = create_room_mesh(room_length, room_depth, room_height);
+		room2_mesh.apply_translation_to_position({ -room_length - 1.0f, -room_depth - 1.0f, 0 });
+		room2.initialize_data_on_gpu(room1_mesh);
 
-	// ***************************************** //
-	// Set-up portals
-	// ***************************************** //
+		room2.material.color = { 0.6f, 0.85f, 0.5f };
+		room2.material.phong.specular = 0.0f; // non-specular terrain material
 
-	/*
-	mesh portal14_mesh = create_portal_mesh(room_height);
-	portal14_mesh.apply_translation_to_position({0.5f, room_depth, 0});
-	portal14.initialize_data_on_gpu(portal14_mesh);
 
-	mesh portal12_mesh = create_portal_mesh(room_height);
-	portal12_mesh.apply_translation_to_position({room1_length-1.5f, room_depth, 0});
-	portal12.initialize_data_on_gpu(portal12_mesh);
+		// ********************************** //
+		//          Rabbit animation          //
+		// ********************************** //
 
-	mesh portal21_mesh = create_portal_mesh(room_height);
-	portal21_mesh.apply_translation_to_position({0.5f+room1_length+1.0f, room_depth, 0});
-	portal21.initialize_data_on_gpu(portal21_mesh);
+		hierarchy = bunny();
 
-	mesh portal23_mesh = create_portal_mesh(room_height);
-	portal23_mesh.apply_translation_to_position({room2_length-1.5f+room1_length+1.0f, room_depth, 0});
-	portal23.initialize_data_on_gpu(portal23_mesh);
+		// ********************************** //
+		//            Forest scene            //
+		// ********************************** //
 
-	mesh portal32_mesh = create_portal_mesh(room_height);
-	portal32_mesh.apply_translation_to_position({0.5f+room1_length+room2_length+2.0f, room_depth, 0});
-	portal32.initialize_data_on_gpu(portal32_mesh);
+		// pine trees
+		mesh pineFoliage_mesh = transform(mesh_load_file_obj("assets/PineFoliage.obj"));
+		pineFoliage.initialize_data_on_gpu(pineFoliage_mesh);
+		pineFoliage.material.color = { 0.00f, 0.40f, 0.00f };
+		pineFoliage.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture_foliage_tree.jpg", GL_REPEAT, GL_REPEAT);
+		mesh pineTrunks_mesh = transform(mesh_load_file_obj("assets/PineTrunks.obj"));
+		pineTrunks.initialize_data_on_gpu(pineTrunks_mesh);
+		pineTrunks.material.color = { 0.40f, 0.27f, 0.00f };
+		pineTrunks.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/trunk.jpg", GL_REPEAT, GL_REPEAT);
 
-	mesh portal34_mesh = create_portal_mesh(room_height);
-	portal34_mesh.apply_translation_to_position({room3_length-1.5f+room1_length+room2_length+2.0f, room_depth, 0});
-	portal34.initialize_data_on_gpu(portal34_mesh);
+		// trees
+		mesh treeFoliage_mesh = transform(mesh_load_file_obj("assets/TreeFoliage.obj"));
+		treeFoliage.initialize_data_on_gpu(treeFoliage_mesh);
+		treeFoliage.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture_foliage_tree.jpg", GL_REPEAT, GL_REPEAT);
+		mesh treeTrunks_mesh = transform(mesh_load_file_obj("assets/TreeTrunks.obj"));
+		treeTrunks.initialize_data_on_gpu(treeTrunks_mesh);
+		treeTrunks.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/trunk.jpg", GL_REPEAT, GL_REPEAT);
 
-	mesh portal43_mesh = create_portal_mesh(room_height);
-	portal43_mesh.apply_translation_to_position({0.5f+room1_length+room2_length+room3_length+3.0f, room_depth, 0});
-	portal43.initialize_data_on_gpu(portal43_mesh);
+		// ground and lake
+		mesh ground_mesh = transform(mesh_load_file_obj("assets/Ground.obj"));
+		ground.initialize_data_on_gpu(ground_mesh);
+		ground.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture_grass.png", GL_REPEAT, GL_REPEAT);
+		mesh lake_mesh = transform(mesh_load_file_obj("assets/Lake.obj"));
+		lake.initialize_data_on_gpu(lake_mesh);
+		lake.material.color = { 0.60f, 0.80f, 1.00f };
 
-	mesh portal41_mesh = create_portal_mesh(room_height);
-	portal41_mesh.apply_translation_to_position({room4_length-1.5f+room1_length+room2_length+room3_length+3.0f, room_depth, 0});
-	portal41.initialize_data_on_gpu(portal41_mesh);
-	*/
+		// house, well and barrels
+		mesh roof_mesh = transform(mesh_load_file_obj("assets/Roofs.obj"));
+		roof.initialize_data_on_gpu(roof_mesh);
+		roof.material.color = { 0.60f, 0.00f, 0.00f };
+		mesh stone_mesh = transform(mesh_load_file_obj("assets/HouseStones.obj"));
+		stone.initialize_data_on_gpu(stone_mesh);
+		stone.material.color = { 0.40f, 0.4f, 0.40f };
+		stone.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture-stone.jpg", GL_REPEAT, GL_REPEAT);
+		mesh wood_mesh = transform(mesh_load_file_obj("assets/HouseWood.obj"));
+		wood.initialize_data_on_gpu(wood_mesh);
+		wood.material.color = { 0.20f, 0.10f, 0.00f };
+		wood.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture-wood2.jpg", GL_REPEAT, GL_REPEAT);
+		mesh barrel_mesh = transform(mesh_load_file_obj("assets/Barrels.obj"));
+		barrel.initialize_data_on_gpu(barrel_mesh);
+		barrel.material.color = { 1.00f, 0.90f, 0.70f };
+		barrel.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture-tonneau.png", GL_REPEAT, GL_REPEAT);
+		mesh house_mesh = transform(mesh_load_file_obj("assets/House.obj"));
+		house.initialize_data_on_gpu(house_mesh);
+		house.material.color = { 1.00f, 0.93f, 0.80f };
+		house.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture-house.png", GL_REPEAT, GL_REPEAT);
 
-	// portal12 = room1->get_portal_1();
-	// portal21 = room1->get_portal_2();
-	// portal21 = room2->get_portal_1();
-	// portal23 = room2->get_portal_2();
 
-	room1->get_portal_1()->link_portals(*room2->get_portal_2());
-	room1->get_portal_2()->link_portals(*room2->get_portal_1());
+		// ********************************** //
+		//             Monkey face            //
+		// ********************************** //
 
-	cgp::rotation_transform a = cgp::rotation_transform::from_axis_angle({0.f, 0.f, 1.f}, 0);
-	cgp::affine_rt b = cgp::rotation_around_center(a, {0.f, 0.f, 0.f});
+		mesh suzanne_mesh = mesh_load_file_obj("assets/suzanne.obj");
+		suzanne_mesh.apply_scaling_to_position(0.3f);
+		monkey.initialize_data_on_gpu(suzanne_mesh);
+		monkey.material.color = { 0.68f, 0.55f, 0.34f };
 
-	room1->get_portal_1()->portal_mesh_drawable.model = cgp::affine_rt(a, room1->get_portal_1()->position_of_center);
+	};
+	// END ADDED BY GALLE
 
-	portals_to_draw.push_back(room1->get_portal_1());
-	portals_to_draw.push_back(room1->get_portal_2());
-	portals_to_draw.push_back(room2->get_portal_1());
-	portals_to_draw.push_back(room2->get_portal_2());
+
+
+	// // ***************************************** //
+	// // Set-up 4 rooms
+	// // ***************************************** //
+
+	// float room1_length = 5.0f; //more than 4.0f
+	// float room2_length = 10.0f; // more than 4.0f
+	// float room3_length = 4.0f; // more than 4.0f
+	// float room4_length = 8.0f; // more than 4.0f
+	// float room_depth = 2.0f;
+	// float room_height = 2.0f;
+
+
+	// player.initialize_data_on_gpu(mesh_primitive_tetrahedron());
+	// player.model.translation = vec3(5.f, 0.f, 0.f) + vec3(uflt_dist10(rng), uflt_dist10(rng), uflt_dist10(rng));// camera_control.camera_model.position();
+	// // room 1
+	// room1 = new room(room1_length, room_depth, room_height, { 0,0,0 });
+
+	// room1->room_mesh_drawable.material.color = { 0.6f,0.85f,0.5f };
+	// room1->room_mesh_drawable.material.phong.specular = 0.0f;
+
+	// //room 2
+	// room2 = new room(room2_length, room_depth, room_height, { room2_length + 0.5f, room_depth + 0.5f, 0.0f }, M_PI_2);
+
+	// room2->room_mesh_drawable.material.color = { 0.5f,0.5f,0.7f };
+	// room2->room_mesh_drawable.material.phong.specular = 0.0f;
+
+	// room1->get_portal_1()->link_portals(*room2->get_portal_2());
+	// room1->get_portal_2()->link_portals(*room2->get_portal_1());
+
+	// cgp::rotation_transform a = cgp::rotation_transform::from_axis_angle({ 0.f, 0.f, 1.f }, 0);
+	// cgp::affine_rt b = cgp::rotation_around_center(a, { 0.f, 0.f, 0.f });
+
+	// room1->get_portal_1()->portal_mesh_drawable.model = cgp::affine_rt(a, room1->get_portal_1()->position_of_center);
+
+	// portals_to_draw.push_back(room1->get_portal_1());
+	// portals_to_draw.push_back(room1->get_portal_2());
+	// portals_to_draw.push_back(room2->get_portal_1());
+	// portals_to_draw.push_back(room2->get_portal_2());
 }
 
 
@@ -152,7 +197,7 @@ void scene_structure::set_view_m(cgp::mat4& view_m)
 {
 	environment.camera_view = view_m;
 	environment.light = cgp::inverse(view_m).col_w_vec3(); // MAYBE ALSO SET LIGHT OT VIEW M POSITION HERE??
-	
+
 }
 
 void scene_structure::set_proj_m(cgp::mat4& proj_m)
@@ -164,11 +209,91 @@ void scene_structure::draw_non_portal(cgp::mat4& view_m, cgp::mat4& proj_m)
 {
 	set_view_m(view_m);
 	set_proj_m(proj_m);
-	
-	
-	room1->draw(environment);
-	room2->draw(environment);
-	draw(player, environment);
+
+
+	{
+		draw(ground, environment);
+		draw(lake, environment);
+
+		draw(pineTrunks, environment);
+		draw(pineFoliage, environment);
+		draw(treeTrunks, environment);
+		draw(treeFoliage, environment);
+
+		draw(roof, environment);
+		draw(stone, environment);
+		draw(barrel, environment);
+		draw(wood, environment);
+		draw(house, environment);
+
+		timer.update();
+
+		// Apply transformation to some elements of the hierarchy
+		rotation_transform r_head = rotation_transform::from_axis_angle({ 0, 1, 0 }, Pi / 6);
+		rotation_transform r_head_anim = rotation_transform::from_axis_angle({ 0, 1, 0 }, 0.25f * cos(2 * timer.t));
+		hierarchy["head"].transform_local.rotation = r_head * r_head_anim;
+		hierarchy.update_local_to_global_coordinates();
+		hierarchy["body"].transform_local.scaling = 6;
+		hierarchy["body"].transform_local.translation = { 3,1,0 };
+		hierarchy["body"].transform_local.rotation = rotation_transform::from_axis_angle({ 0, 0, 1 }, Pi / 2 + Pi / 8);
+
+		draw(hierarchy, environment);
+		// draw(monkey, environment);
+
+		/*
+		draw(terrain, environment);
+
+		for (int i = 0; i < N_trees; i++)
+		{
+			tree.model.translation = tree_position[i];
+			trunk.model.translation = tree_position[i];
+			draw(tree, environment);
+			draw(trunk, environment);
+			pinetree.model.translation = pinetree_position[i];
+			trunk.model.translation = pinetree_position[i];
+			draw(pinetree, environment);
+			draw(trunk, environment);
+			rose.model.translation = rose_position[2 * i];
+			tige.model.translation = rose_position[2 * i];
+			orangeflower.model.translation = orangeflower_position[2 * i];
+			mushroom.model.translation = mushroom_position[i];
+			mushroom_tige.model.translation = mushroom_position[i];
+			draw(mushroom, environment);
+			draw(rose, environment);
+			draw(tige, environment);
+			draw(mushroom_tige, environment);
+			draw(orangeflower, environment);
+			rose.model.translation = rose_position[2 * i + 1];
+			tige.model.translation = rose_position[2 * i + 1];
+			orangeflower.model.translation = orangeflower_position[2 * i + 1];
+			draw(rose, environment);
+			draw(tige, environment);
+			draw(orangeflower, environment);
+		}
+
+		*/
+
+		if (gui.display_wireframe)
+		{
+			draw_wireframe(room1, environment);
+			draw_wireframe(room2, environment);
+			draw_wireframe(hierarchy, environment);
+			draw_wireframe(tree, environment);
+			draw_wireframe(trunk, environment);
+			draw_wireframe(pinetree, environment);
+			draw_wireframe(trunk, environment);
+			draw_wireframe(mushroom, environment);
+			draw_wireframe(rose, environment);
+			draw_wireframe(tige, environment);
+			draw_wireframe(mushroom_tige, environment);
+			draw_wireframe(orangeflower, environment);
+		}
+
+	};
+
+	// room1->draw(environment);
+	// room2->draw(environment);
+	// draw(player, environment);
 }
 
 
@@ -177,27 +302,27 @@ void scene_structure::display_portals_recursion(cgp::mat4 view_m, cgp::mat4 proj
 {
 	// This function is supposed to do basically the same thing as what is shown before, except it doesn't bother showing anything
 	// that is outside the view of the portal. Well, I didn't bother tbh...
-	
-    // now draw the portal object again
+
+	// now draw the portal object again
 
 	// POUR LINSTANT : RIEN DE RECURSIF. Chuis pas assez fort pour ça.
-	
+
 	// Draw scene objects normally, only at recursionLevel
 
 
-	for (int i=0; i<portals_to_draw.size(); i++) {
+	for (int i = 0; i < portals_to_draw.size(); i++) {
 
-		if (! portals_to_draw[i]->linked)
+		if (!portals_to_draw[i]->linked)
 			continue;
 
 		/*
-        glEnable(GL_STENCIL_TEST);
-        // Everything happens in-between
-        
-        glStencilFunc(GL_NEVER, 1, 0xFF);
-        glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP); // Stencil options and parameters
-        glStencilMask(0XEF); // To clip anything not seen
-        glClear(GL_STENCIL_BUFFER_BIT);
+		glEnable(GL_STENCIL_TEST);
+		// Everything happens in-between
+
+		glStencilFunc(GL_NEVER, 1, 0xFF);
+		glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP); // Stencil options and parameters
+		glStencilMask(0XEF); // To clip anything not seen
+		glClear(GL_STENCIL_BUFFER_BIT);
 		*/
 
 		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
@@ -221,24 +346,24 @@ void scene_structure::display_portals_recursion(cgp::mat4 view_m, cgp::mat4 proj
 		// Enable (writing into) all stencil bits
 		glStencilMask(0xFF);
 
-        // BEGIN DRAW STENCIl
-        //cgp::draw(portal_mesh_drawable, environment);
+		// BEGIN DRAW STENCIl
+		//cgp::draw(portal_mesh_drawable, environment);
 		set_view_m(view_m);
 		set_proj_m(proj_m);
 		portals_to_draw[i]->draw_stencil(environment);
-        // END DRAW STENCIL
-		
+		// END DRAW STENCIL
+
 		cgp::mat4 fm = cgp::inverse(view_m);
 		std::pair<glm::mat4, cgp::mat4> p = portals_to_draw[i]->get_portal_view(view_m, fm);
-	
-        glm::mat4 proj_clipped = portals_to_draw[i]->clippedProjMat(p.first, convert_cgp_to_glm_mat4(proj_m));
+
+		glm::mat4 proj_clipped = portals_to_draw[i]->clippedProjMat(p.first, convert_cgp_to_glm_mat4(proj_m));
 		cgp::mat4 proj_clipped_cgp = convert_glm_to_cgp_mat4(proj_clipped);
 
 
 		if (recursion_level == max_recursion_level) {
 			glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 			glDepthMask(GL_TRUE);
-			
+
 			// Clear the depth buffer so we don't interfere with stuff
 			// outside of this inner portal
 			glClear(GL_DEPTH_BUFFER_BIT);
@@ -262,18 +387,19 @@ void scene_structure::display_portals_recursion(cgp::mat4 view_m, cgp::mat4 proj
 			// use an edited projection matrix to set the near plane to the portal plane
 			draw_non_portal(p.second, proj_clipped_cgp);
 			//drawNonPortals(destView, projMat);
-		} else {
-			display_portals_recursion(p.second, proj_clipped_cgp, recursion_level+1);
+		}
+		else {
+			display_portals_recursion(p.second, proj_clipped_cgp, recursion_level + 1);
 		}
 		/*
-        glClear(GL_DEPTH_BUFFER_BIT);
-        // THe stencil mask!
-        glStencilMask(0x00);
-        glStencilFunc(GL_EQUAL, 1, 0xFF);
-		
+		glClear(GL_DEPTH_BUFFER_BIT);
+		// THe stencil mask!
+		glStencilMask(0x00);
+		glStencilFunc(GL_EQUAL, 1, 0xFF);
+
 
 		draw_non_portal(p.second, proj_clipped_cgp);
-		
+
 		glDisable(GL_STENCIL_TEST);
 		*/
 
@@ -299,7 +425,7 @@ void scene_structure::display_portals_recursion(cgp::mat4 view_m, cgp::mat4 proj
 		set_proj_m(proj_m);
 		portals_to_draw[i]->draw_stencil(environment);
 	}
-	
+
 	//Disable the stencil test and stencil writing
 	glDisable(GL_STENCIL_TEST);
 	glStencilMask(0x00);
@@ -320,12 +446,12 @@ void scene_structure::display_portals_recursion(cgp::mat4 view_m, cgp::mat4 proj
 	// Draw portals into depth buffer
 	set_view_m(view_m);
 	set_proj_m(proj_m);
-	for (int i=0; i<portals_to_draw.size(); i++) {
-		if (!portals_to_draw[i]->linked) 
+	for (int i = 0; i < portals_to_draw.size(); i++) {
+		if (!portals_to_draw[i]->linked)
 			continue;
 		portals_to_draw[i]->draw_stencil(environment);
 	}
-	
+
 	// Reset the depth function to the default
 	glDepthFunc(GL_LESS);
 
@@ -359,17 +485,19 @@ void scene_structure::mouse_move_event()
 	if (!inputs.keyboard.shift)
 		camera_control.action_mouse_move(environment.camera_view);
 }
+
 void scene_structure::mouse_click_event()
 {
 	camera_control.action_mouse_click(environment.camera_view);
 }
+
 void scene_structure::keyboard_event()
 {
 	camera_control.action_keyboard(environment.camera_view);
 }
 
 void scene_structure::update_camera_teleportation_through_portal() {
-	for (int i=0; i<portals_to_draw.size(); i++) {
+	for (int i = 0; i < portals_to_draw.size(); i++) {
 		if (portals_to_draw[i]->linked) {
 			bool portal_int = portal_intersection(camera_control.before_pos, camera_control.after_pos, *portals_to_draw[i]);
 			if (portal_int) {
@@ -378,7 +506,7 @@ void scene_structure::update_camera_teleportation_through_portal() {
 				std::pair<glm::mat4, cgp::mat4> p = portals_to_draw[i]->get_portal_view(cv, cf);
 				cgp::mat4 frame_after_mv = cgp::inverse(p.second);
 
-				camera_control.camera_model.look_at(cgp::inverse(p.second).col_w_vec3() + 0.001 * cgp::inverse(p.second).apply_to_vec3_vector({0.f, 0.f, 1.f}) , cgp::inverse(p.second).col_w_vec3() - cgp::inverse(p.second).apply_to_vec3_vector({0.f, 0.f, 1.f}));
+				camera_control.camera_model.look_at(cgp::inverse(p.second).col_w_vec3() + 0.001 * cgp::inverse(p.second).apply_to_vec3_vector({ 0.f, 0.f, 1.f }), cgp::inverse(p.second).col_w_vec3() - cgp::inverse(p.second).apply_to_vec3_vector({ 0.f, 0.f, 1.f }));
 				//display_frame();
 				return;
 			}
@@ -386,14 +514,12 @@ void scene_structure::update_camera_teleportation_through_portal() {
 	}
 }
 
-
-
 void scene_structure::idle_frame()
 {
 	// Go through all the portals and check for portal intesection.
 	// std::cout << "Before : " << camera_control.before_pos << std::endl;
 	// std::cout << "After : " << camera_control.after_pos << std::endl;
-	
+
 
 	camera_control.idle_frame(environment.camera_view);
 	update_camera_teleportation_through_portal();

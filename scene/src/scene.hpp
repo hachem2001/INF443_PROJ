@@ -45,42 +45,60 @@ struct scene_structure : cgp::scene_inputs_generic {
 
 	
 
+
+
 	// ****************************** //
 	// Elements and shapes of the scene
 	// ****************************** //
 
-	//room rooms[4];
-	//portal portals[8];
+	// ADDING WHAT IS DONE BY GAELLE
+	timer_basic timer;
 
-	// cgp::mesh_drawable room1;
-	// cgp::mesh_drawable room2;
-	// cgp::mesh_drawable room3;
-	// cgp::mesh_drawable room4;
 
-	// cgp::mesh_drawable portal12;
-	// cgp::mesh_drawable portal14;
-	// cgp::mesh_drawable portal21;
-	// cgp::mesh_drawable portal23;
-	// cgp::mesh_drawable portal32;
-	// cgp::mesh_drawable portal34;
-	// cgp::mesh_drawable portal43;
-	// cgp::mesh_drawable portal41;
+	cgp::mesh_drawable room1;
+	cgp::mesh_drawable room2;
+	cgp::mesh_drawable room3;
+	cgp::mesh_drawable room4;
 
-	mesh_drawable player;
+	cgp::hierarchy_mesh_drawable hierarchy;
 
-	room* room1;
-	room* room2;
-	// room room3;
-	// room room4;
+	cgp::mesh_drawable ground;
+	cgp::mesh_drawable lake;
+	cgp::mesh_drawable pineTrunks;
+	cgp::mesh_drawable pineFoliage;
+	cgp::mesh_drawable treeTrunks;
+	cgp::mesh_drawable treeFoliage;
+	cgp::mesh_drawable house;
+	cgp::mesh_drawable roof;
+	cgp::mesh_drawable wood;
+	cgp::mesh_drawable barrel;
+	cgp::mesh_drawable stone;
 
-	// portal portal12;
-	// portal portal14;
-	// portal portal21;
-	// portal portal23;
-	// portal portal32;
-	// portal portal34;
-	// portal portal43;
-	// portal portal41;
+	int N_trees = 20;
+	cgp::mesh_drawable terrain;
+	cgp::mesh_drawable tree;
+	cgp::mesh_drawable pinetree;
+	cgp::mesh_drawable trunk;
+	cgp::mesh_drawable rose;
+	cgp::mesh_drawable tige;
+	cgp::mesh_drawable orangeflower;
+	cgp::mesh_drawable mushroom;
+	cgp::mesh_drawable mushroom_tige;
+	std::vector<cgp::vec3> tree_position;
+	std::vector<cgp::vec3> pinetree_position;
+	std::vector<cgp::vec3> rose_position;
+	std::vector<cgp::vec3> orangeflower_position;
+	std::vector<cgp::vec3> mushroom_position;
+
+	cgp::mesh_drawable monkey;
+	
+	// END ADDING WHAT IS DONE BY GAELLE
+
+
+	// mesh_drawable player;
+
+	// room* room1;
+	// room* room2;
 
 	// ****************************** //
 	// Functions
