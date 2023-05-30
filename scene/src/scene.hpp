@@ -64,10 +64,13 @@ struct scene_structure : cgp::scene_inputs_generic {
 
 	cgp::mesh_drawable room1;
 	cgp::mesh_drawable groundroom1;
+	cgp::mesh_drawable roof1;
 	cgp::mesh_drawable room2;
 	cgp::mesh_drawable groundroom2;
+	cgp::mesh_drawable roof2;
 	cgp::mesh_drawable room3;
 	cgp::mesh_drawable groundroom3;
+	cgp::mesh_drawable roof3;
 
 	// cgp::mesh_drawable portal12;
 	// cgp::mesh_drawable portal13;
