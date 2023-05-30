@@ -62,7 +62,7 @@ void camera_controller_custom::idle_frame(mat4& camera_matrix_view)
 	assert_cgp_no_msg(window != nullptr);
 	if (!is_active) return;
 
-	float const magnitude = 20 * inputs->time_interval;
+	float const magnitude = 5 * inputs->time_interval;
 
 	vec3 before_position = camera_model.position();
 

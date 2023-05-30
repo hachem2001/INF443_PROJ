@@ -16,6 +16,13 @@ cgp::mesh create_portal_mesh(float room_height) {
     return m;
 }
 
+cgp::mesh create_portal_mesh(float room_height, float room_length) {
+
+    //shapes
+    cgp::mesh m = cgp::mesh_primitive_quadrangle({ 0,0.0f,0.0f }, { 1.0f * room_length/5.0f ,0.0f,0.0f }, { 1.0f * room_length/5.0f, 0, room_height }, { 0,0,room_height });
+    return m;
+}
+
 glm::mat4 convert_cgp_to_glm_mat4(cgp::mat4 thematrix_inquestion) {
     glm::mat4 result;
     for (int i = 0; i < 4; i++) {
@@ -208,6 +215,43 @@ portal::portal(float room_height, cgp::vec3 position = { 0,0,0 }, float rotation
 
 }
 
+portal::portal(float room_height, float room_length, cgp::vec3 position, float rotation)
+{
+    linked = false;
+    this->rotation = rotation;
+
+    portal_mesh = create_portal_mesh(room_height, room_length);
+
+    position_of_center = (portal_mesh.position[0] + portal_mesh.position[2]) / 2.f;
+    portal_mesh.apply_translation_to_position(-position_of_center);
+
+    position_of_center += position;
+
+    cgp::rotation_transform a = cgp::rotation_transform::from_axis_angle({0.f, 0.f, 1.f}, rotation);
+    cgp::affine_rt b = cgp::rotation_around_center(a, {0.f, 0.f, 0.f});
+    //portal_mesh.apply_rotation_to_position({0.f, 0.f, 1.f}, 20.f);
+
+    portal_mesh.color.fill({ 0.8f, 0.3f, 0.3f });
+    portal_mesh_drawable.initialize_data_on_gpu(portal_mesh);
+    //portal_mesh_drawable.model.translation = position_of_center;
+    portal_mesh_drawable.model = cgp::affine_rt(a, position_of_center);
+
+    std::cout << portal_mesh_drawable.model.rotation.data << std::endl;
+
+    associated_camera_sphere_representative = cgp::mesh_primitive_sphere(0.4f);
+    associated_camera_sphere_representative.color.fill({ 0.1f, 0.3f, 0.3f });
+    associated_camera_sphere_representative_drawable.initialize_data_on_gpu(associated_camera_sphere_representative);
+
+    normal = { 0.f, 1.f, 0.f };
+
+    glm_position = glm::vec3(position_of_center[0], position_of_center[1], position_of_center[2]);
+    //glm_orientation = glm::quat(1.f, 0.f, 0.f, 0.f);
+
+    cgp::quaternion q = portal_mesh_drawable.model.rotation.data;
+    glm_orientation = glm::quat(q.x, q.y, q.z, q.w);
+
+}
+
 void portal::link_portals(portal& portal2)
 {
     // Unlink both portals if ever any of them are linked
@@ -231,6 +275,15 @@ void portal::link_portals(portal& portal2)
     linked = true;
 
 }
+
+void portal::mono_link_portal(portal& portal2)
+{
+    // Link both portals
+    connected_portal = &portal2;
+    linked = true;
+
+}
+
 
 std::pair<glm::mat4, cgp::mat4> portal::get_portal_view(cgp::mat4& cam_v, cgp::mat4& cam_f) {
     glm::mat4 camera_view;

@@ -3,18 +3,25 @@
 
 using namespace cgp;
 
+mesh create_ground_mesh(float room_length, float room_depth)
+{
+    return mesh_primitive_quadrangle({0, 0.0f, 0.0f}, {room_length, 0.0f, 0.0f}, {room_length, room_depth, 0}, {0, room_depth, 0.0f});
+}
 
 mesh create_room_mesh(float room_length, float room_depth, float room_height) {
     mesh m;
 
+    float scale = room_length/5.0f;
+    float spacer = scale * 1.5f;
+    float spacer_2 = scale * 0.5f;
     //shapes
     mesh sol = mesh_primitive_quadrangle({ 0,0.0f,0.0f }, { room_length,0.0f,0.0f }, { room_length,room_depth,0 }, { 0,room_depth,0.0f });
     mesh wall_1 = mesh_primitive_quadrangle({ 0,0.0f,0.0f }, { room_length,0.0f,0.0f }, { room_length,0,room_height }, { 0,0,room_height });
     mesh wall_2 = mesh_primitive_quadrangle({ 0,0.0f,0.0f }, { 0,room_depth,0.0f }, { 0,room_depth,room_height }, { 0,0,room_height });
     mesh wall_3 = mesh_primitive_quadrangle({ room_length,0.0f,0.0f }, { room_length,room_depth,0.0f }, { room_length,room_depth,room_height }, { room_length,0,room_height });
-    mesh wall_4 = mesh_primitive_quadrangle({ 0,room_depth,0.0f }, { 0.5f,room_depth,0.0f }, { 0.5f,room_depth,room_height }, { 0,room_depth,room_height });
-    mesh wall_5 = mesh_primitive_quadrangle({ 1.5f,room_depth,0.0f }, { room_length - 1.5f,room_depth,0.0f }, { room_length - 1.5f,room_depth,room_height }, { 1.5f,room_depth,room_height });
-    mesh wall_6 = mesh_primitive_quadrangle({ room_length - 0.5f,room_depth,0.0f }, { room_length,room_depth,0.0f }, { room_length,room_depth,room_height }, { room_length - 0.5f,room_depth,room_height });
+    mesh wall_4 = mesh_primitive_quadrangle({ 0,room_depth,0.0f }, { spacer_2,room_depth,0.0f }, { spacer_2,room_depth,room_height }, { 0,room_depth,room_height });
+    mesh wall_5 = mesh_primitive_quadrangle({ spacer,room_depth,0.0f }, { room_length - spacer,room_depth,0.0f }, { room_length - spacer,room_depth,room_height }, { spacer,room_depth,room_height });
+    mesh wall_6 = mesh_primitive_quadrangle({ room_length - spacer_2,room_depth,0.0f }, { room_length,room_depth,0.0f }, { room_length,room_depth,room_height }, { room_length - spacer_2,room_depth,room_height });
 
     //colors
     sol.color.fill({ 0.4f, 0.3f, 0.3f });

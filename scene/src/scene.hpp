@@ -43,6 +43,13 @@ struct scene_structure : cgp::scene_inputs_generic {
 
 	std::vector<portal*> portals_to_draw;
 
+	portal* portal1;
+	portal* portal2;
+	portal* portal3;
+	portal* portal4;
+	portal* portal5;
+	portal* portal6;
+	portal* portal7;
 	
 
 
@@ -56,9 +63,22 @@ struct scene_structure : cgp::scene_inputs_generic {
 
 
 	cgp::mesh_drawable room1;
+	cgp::mesh_drawable groundroom1;
 	cgp::mesh_drawable room2;
+	cgp::mesh_drawable groundroom2;
 	cgp::mesh_drawable room3;
-	cgp::mesh_drawable room4;
+	cgp::mesh_drawable groundroom3;
+
+	// cgp::mesh_drawable portal12;
+	// cgp::mesh_drawable portal13;
+	// cgp::mesh_drawable portal21;
+	// cgp::mesh_drawable portal23;
+	// cgp::mesh_drawable portal32;
+	// cgp::mesh_drawable portal31;
+
+	cgp::mesh_drawable monkey;
+	cgp::mesh_drawable boat;
+	cgp::mesh_drawable sofa;
 
 	cgp::hierarchy_mesh_drawable hierarchy;
 
@@ -90,7 +110,7 @@ struct scene_structure : cgp::scene_inputs_generic {
 	std::vector<cgp::vec3> orangeflower_position;
 	std::vector<cgp::vec3> mushroom_position;
 
-	cgp::mesh_drawable monkey;
+	//cgp::mesh_drawable monkey;
 	
 	// END ADDING WHAT IS DONE BY GAELLE
 

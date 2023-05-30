@@ -35,11 +35,15 @@ public:
     ///@param position The position of the portal
     /// I will probably add "normal" next. Because it's _VERY_ useful to have for portals
     portal(float room_height, cgp::vec3 position, float rotation = 180.f);
-    
+
+    portal(float room_height, float room_length, cgp::vec3 position, float rotation = 180.f);
+
     ///@brief Link two portals together
     ///@param portal1 first portal to link
     ///@param portal2 second portal to link
     void link_portals(portal& portal2);
+
+    void mono_link_portal(portal& portal2);
 
     ///@brief Begins the portal draw
     ///@param camera The camera from which to mirror then draw the opposing view
@@ -69,6 +73,8 @@ public:
 };
 
 cgp::mesh create_portal_mesh(float room_height);
+cgp::mesh create_portal_mesh(float room_height, float room_length);
+
 bool portal_intersection(cgp::vec3 la, cgp::vec3 lb, portal& portal);
 glm::mat4 convert_cgp_to_glm_mat4(cgp::mat4 thematrix_inquestion);
 cgp::mat4 convert_glm_to_cgp_mat4(glm::mat4 thematrix_inquestion);
