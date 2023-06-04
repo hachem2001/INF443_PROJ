@@ -16,8 +16,8 @@ void scene_structure::initialize()
 	// ***************************************** //
 
 	float room1_length = 5.0f; //more than 4.0f
-	float room2_length = 10.0f; //more than 4.0f
-	float room3_length = 4.0f; //more than 4.0f
+	float room2_length = 5.0f; //more than 4.0f
+	float room3_length = 5.0f; //more than 4.0f
 	float room_depth = 2.0f;
 	float room_height = 2.0f;
 
