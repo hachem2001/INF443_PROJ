@@ -63,7 +63,7 @@ struct scene_structure : cgp::scene_inputs_generic {
 
 
 	cgp::mesh_drawable room1;
-	cgp::mesh_drawable groundroom1;
+	cgp::mesh_drawable groundroom1;	
 	cgp::mesh_drawable roof1;
 	cgp::mesh_drawable room2;
 	cgp::mesh_drawable groundroom2;
@@ -135,7 +135,12 @@ struct scene_structure : cgp::scene_inputs_generic {
 	void set_proj_m(cgp::mat4& proj_m); // Sets the projection matrix to proj_m 
 	
 
-	void draw_non_portal(cgp::mat4& view_m, cgp::mat4& proj_m); // Draws everything that ISN'T a portal.
+	void draw_non_portal(cgp::mat4& view_m, cgp::mat4& proj_m, int portal_num); // Draws everything that ISN'T a portal.
+	
+	void draw_non_portal_rooms();
+	void draw_non_portal_field();
+
+
 	void display_portals_recursion(cgp::mat4 view_m, cgp::mat4 proj_m, int recursion_level); // Display the scene from a portal's point of view.
 	void display_gui();   // The display of the GUI, also called within the animation loop
 

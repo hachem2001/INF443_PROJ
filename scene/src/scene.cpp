@@ -29,22 +29,113 @@ void scene_structure::initialize()
 	// ***************************************** //
 	camera_control.initialize(inputs, window); // Give access to the inputs and window global state to the camera controler
 	camera_control.set_rotation_axis_z();
-	camera_control.camera_model.set_rotation_axis({0.0f, 0.0f, 1.0f});
-	camera_control.camera_model.look_at({15.0f, 6.0f, 6.0f}, {0, 0, 0});
+	camera_control.camera_model.set_rotation_axis({ 0.0f, 0.0f, 1.0f });
+	camera_control.camera_model.look_at({ 15.0f, 6.0f, 6.0f }, { 0, 0, 0 });
 	global_frame.initialize_data_on_gpu(mesh_primitive_frame());
 
 	// ADDED BY GAELLE
 
-	float room1_length = 5.0f;	// more than 4.0f
-	float room2_length = 10.0f; // more than 4.0f
-	float room3_length = 4.0f;	// more than 4.0f
+	float room1_length = 5.0f; //more than 4.0f
+	float room2_length = 5.0f; //more than 4.0f
+	float room3_length = 5.0f; //more than 4.0f
 	float room_depth = 2.0f;
 	float room_height = 2.0f;
-	vec3 offset_of_all_rooms = cgp::vec3({0.f, 0.f, -30.f});
 
-	camera_control.camera_model.position_camera = offset_of_all_rooms;
+	vec3 offset_of_all_rooms = cgp::vec3({ 0.f, 0.f, -30.f });
+
+	//camera_control.camera_model.position_camera = offset_of_all_rooms;
 
 	{
+		// ***************************************** //
+		// Set-up 3 rooms
+		// ***************************************** //
+
+
+
+		// room 1
+		mesh room1_mesh = create_room_mesh(room1_length, room_depth, room_height);
+		room1_mesh.apply_translation_to_position(vec3{ 0, 0, 0 } + offset_of_all_rooms);
+		room1.initialize_data_on_gpu(room1_mesh);
+
+		room1.texture.load_and_initialize_texture_2d_on_gpu("assets/wall1.png");
+		room1.material.phong.specular = 0.0f; // non-specular terrain material
+
+		mesh groundroom1_mesh = create_ground_mesh(room1_length, room_depth);
+		groundroom1_mesh.apply_translation_to_position(vec3{ 0, 0, 0 } + offset_of_all_rooms);
+		groundroom1.initialize_data_on_gpu(groundroom1_mesh);
+		groundroom1.texture.load_and_initialize_texture_2d_on_gpu("assets/texture-parquet.jpg");
+
+		mesh roofroom1_mesh = create_roof_mesh(room1_length, room_depth, room_height);
+		roofroom1_mesh.apply_translation_to_position(vec3{ 0, 0, 0 } + offset_of_all_rooms);
+		roof1.initialize_data_on_gpu(roofroom1_mesh);
+		// roof1.texture.load_and_initialize_texture_2d_on_gpu("assets/texture-parquet.jpg");
+		
+
+		//room 2
+		mesh room2_mesh = create_room_mesh(room2_length, room_depth, room_height);
+		room2_mesh.apply_translation_to_position(vec3{ room1_length + 1.0f, 0, 0 } + offset_of_all_rooms);
+		room2.initialize_data_on_gpu(room2_mesh);
+
+		room2.texture.load_and_initialize_texture_2d_on_gpu("assets/wall2.jpg", GL_REPEAT, GL_REPEAT);
+		room2.material.phong.specular = 0.0f; // non-specular terrain material
+
+		mesh groundroom2_mesh = create_ground_mesh(room2_length, room_depth);
+		groundroom2_mesh.apply_translation_to_position(vec3{ room1_length + 1.0f, 0, 0 } + offset_of_all_rooms);
+		groundroom2.initialize_data_on_gpu(groundroom2_mesh);
+		groundroom2.texture.load_and_initialize_texture_2d_on_gpu("assets/texture-marbre.jpg");
+
+		mesh roofroom2mesh = create_roof_mesh(room2_length, room_depth, room_height);
+		roofroom2mesh.apply_translation_to_position(vec3{ room1_length + 1.0f, 0, 0 } + offset_of_all_rooms);
+		roof2.initialize_data_on_gpu(roofroom2mesh);
+		// roof2.texture.load_and_initialize_texture_2d_on_gpu("assets/texture-parquet.jpg");
+
+
+		// room 3
+		mesh room3_mesh = create_room_mesh(room3_length, room_depth, room_height);
+		room3_mesh.apply_translation_to_position(vec3{ room1_length + room2_length + 2.0f, 0, 0 } + offset_of_all_rooms);
+		room3.initialize_data_on_gpu(room3_mesh);
+
+		room3.texture.load_and_initialize_texture_2d_on_gpu("assets/wall3.jpg");
+		room3.material.phong.specular = 0.0f; // non-specular terrain material
+
+		mesh groundroom3_mesh = create_ground_mesh(room3_length, room_depth);
+		groundroom3_mesh.apply_translation_to_position(vec3{ room1_length + room2_length + 2.0f, 0, 0 } + offset_of_all_rooms);
+		groundroom3.initialize_data_on_gpu(groundroom3_mesh);
+		groundroom3.texture.load_and_initialize_texture_2d_on_gpu("assets/texture-moquette.jpg");
+
+		mesh roofroom3mesh = create_roof_mesh(room2_length, room_depth, room_height);
+		roofroom3mesh.apply_translation_to_position(vec3{ room1_length + room2_length + 2.0f, 0, 0 } + offset_of_all_rooms);
+		roof3.initialize_data_on_gpu(roofroom3mesh);
+		//roof3.texture.load_and_initialize_texture_2d_on_gpu("assets/texture-parquet.jpg");
+
+
+		// ***************************************** //
+		//                 Decoration                //
+		// ***************************************** //
+
+		mesh suzanne_mesh = mesh_load_file_obj("assets/suzanne.obj");
+		suzanne_mesh.apply_scaling_to_position(0.4f);
+		suzanne_mesh.apply_rotation_to_position({ 0,0,1 }, 2 * Pi / 3);
+		suzanne_mesh.apply_translation_to_position(vec3{ 0.5,0.6,0.43 } + offset_of_all_rooms);
+		monkey.initialize_data_on_gpu(suzanne_mesh);
+		monkey.material.color = { 0.68f, 0.55f, 0.34f };
+
+		mesh boat_mesh = mesh_load_file_obj("assets/Boat.obj");
+		boat_mesh.apply_rotation_to_position({ 0,0,1 }, Pi / 2);
+		boat_mesh.apply_translation_to_position(vec3{ room1_length + room2_length + 2.0f + room3_length / 2,0.3,0 } + offset_of_all_rooms);
+		boat.initialize_data_on_gpu(boat_mesh);
+		boat.material.color = { 0.68f, 0.55f, 0.34f };
+
+		mesh sofa_mesh = mesh_load_file_obj("assets/sofa.obj");
+		sofa_mesh.apply_rotation_to_position({ 0,0,1 }, Pi / 2);
+		sofa_mesh.apply_translation_to_position(vec3{ room1_length + 1.0f + room2_length / 2, 0.15f, 0 } + offset_of_all_rooms);
+		sofa.initialize_data_on_gpu(sofa_mesh);
+		sofa.texture.load_and_initialize_texture_2d_on_gpu("assets/texture-sofa.png", GL_REPEAT, GL_REPEAT);
+		sofa.material.color = { 0.5f, 0.5f, 0.5f };
+	}
+
+	{
+		/*
 		// ********************************** //
 		//               Rooms                //
 		// ********************************** //
@@ -103,6 +194,9 @@ void scene_structure::initialize()
 		roof3.initialize_data_on_gpu(roof3_mesh);
 		roof3.material.color = {1, 1, 1};
 
+		*/
+
+		/*
 		// ***************************************** //
 		//                 Decoration                //
 		// ***************************************** //
@@ -126,6 +220,7 @@ void scene_structure::initialize()
 		sofa.initialize_data_on_gpu(sofa_mesh);
 		sofa.texture.load_and_initialize_texture_2d_on_gpu("assets/texture-sofa.png", GL_REPEAT, GL_REPEAT);
 		sofa.material.color = {0.5f, 0.5f, 0.5f};
+		*/
 
 		// ********************************** //
 		//          Rabbit animation          //
@@ -140,11 +235,11 @@ void scene_structure::initialize()
 		// pine trees
 		mesh pineFoliage_mesh = transform(mesh_load_file_obj("assets/PineFoliage.obj"));
 		pineFoliage.initialize_data_on_gpu(pineFoliage_mesh);
-		pineFoliage.material.color = {0.00f, 0.40f, 0.00f};
+		pineFoliage.material.color = { 0.00f, 0.40f, 0.00f };
 		pineFoliage.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture_foliage_tree.jpg", GL_REPEAT, GL_REPEAT);
 		mesh pineTrunks_mesh = transform(mesh_load_file_obj("assets/PineTrunks.obj"));
 		pineTrunks.initialize_data_on_gpu(pineTrunks_mesh);
-		pineTrunks.material.color = {0.40f, 0.27f, 0.00f};
+		pineTrunks.material.color = { 0.40f, 0.27f, 0.00f };
 		pineTrunks.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/trunk.jpg", GL_REPEAT, GL_REPEAT);
 
 		// trees
@@ -161,27 +256,27 @@ void scene_structure::initialize()
 		ground.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture_grass.png", GL_REPEAT, GL_REPEAT);
 		mesh lake_mesh = transform(mesh_load_file_obj("assets/Lake.obj"));
 		lake.initialize_data_on_gpu(lake_mesh);
-		lake.material.color = {0.60f, 0.80f, 1.00f};
+		lake.material.color = { 0.60f, 0.80f, 1.00f };
 
 		// house, well and barrels
 		mesh roof_mesh = transform(mesh_load_file_obj("assets/Roofs.obj"));
 		roof.initialize_data_on_gpu(roof_mesh);
-		roof.material.color = {0.60f, 0.00f, 0.00f};
+		roof.material.color = { 0.60f, 0.00f, 0.00f };
 		mesh stone_mesh = transform(mesh_load_file_obj("assets/HouseStones.obj"));
 		stone.initialize_data_on_gpu(stone_mesh);
-		stone.material.color = {0.40f, 0.4f, 0.40f};
+		stone.material.color = { 0.40f, 0.4f, 0.40f };
 		stone.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture-stone.jpg", GL_REPEAT, GL_REPEAT);
 		mesh wood_mesh = transform(mesh_load_file_obj("assets/HouseWood.obj"));
 		wood.initialize_data_on_gpu(wood_mesh);
-		wood.material.color = {0.20f, 0.10f, 0.00f};
+		wood.material.color = { 0.20f, 0.10f, 0.00f };
 		wood.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture-wood2.jpg", GL_REPEAT, GL_REPEAT);
 		mesh barrel_mesh = transform(mesh_load_file_obj("assets/Barrels.obj"));
 		barrel.initialize_data_on_gpu(barrel_mesh);
-		barrel.material.color = {1.00f, 0.90f, 0.70f};
+		barrel.material.color = { 1.00f, 0.90f, 0.70f };
 		barrel.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture-tonneau.png", GL_REPEAT, GL_REPEAT);
 		mesh house_mesh = transform(mesh_load_file_obj("assets/House.obj"));
 		house.initialize_data_on_gpu(house_mesh);
-		house.material.color = {1.00f, 0.93f, 0.80f};
+		house.material.color = { 1.00f, 0.93f, 0.80f };
 		house.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture-house.png", GL_REPEAT, GL_REPEAT);
 	};
 	// END ADDED BY GALLE
@@ -191,14 +286,24 @@ void scene_structure::initialize()
 	float persistent_rotation = 0; // M_PI/12.f;
 	float persistent_rotation_2 = 0;
 
-	portal1 = new portal(room_height, room1_length, vec3{0.385343f, 0.968992f, 1.487787f}, persistent_rotation + M_PI + persistent_rotation_2);
-	portal2 = new portal(room_height, room1_length, vec3{room1_length / 5.f * 0.5f, room_depth, 0} + offset_of_all_rooms + vec3{0.f, 0.f, 0.f}, persistent_rotation);
-	portal3 = new portal(room_height, room1_length, vec3{room1_length - room1_length / 5.f * 1.5f, room_depth, 0} + offset_of_all_rooms + vec3{0, 0, 0}, persistent_rotation);
-	portal4 = new portal(room_height, room1_length, vec3{room1_length / 5.f * 0.5f, room_depth, 0} + offset_of_all_rooms + vec3{room1_length + 1.0f, 0, 0}, persistent_rotation);
-	portal5 = new portal(room_height, room1_length, vec3{room2_length - room1_length / 5.f * 1.5f, room_depth, 0} + offset_of_all_rooms + vec3{room1_length + 1.0f, 0, 0}, persistent_rotation);
-	portal6 = new portal(room_height, room1_length, vec3{room1_length / 5.f * 0.5f, room_depth, 0} + offset_of_all_rooms + vec3{room2_length + room1_length + 2.0f, 0, 0}, persistent_rotation);
-	portal7 = new portal(room_height, room1_length, vec3{room3_length - room1_length / 5.f * 1.5f, room_depth, 0} + offset_of_all_rooms + vec3{room2_length + room1_length + 2.0f, 0, 0}, persistent_rotation);
+	portal1 = new portal(room_height, room1_length, vec3{ 0.55343f, 2.968992f, 1.487787f }, persistent_rotation + M_PI + persistent_rotation_2);
 
+	portal2 = new portal(room_height, room1_length, vec3{0.5f, room_depth, 0} + offset_of_all_rooms + vec3{0.f, 0.f, 0.f}, persistent_rotation);
+	portal3 = new portal(room_height, room1_length, vec3{room1_length-1.5f, room_depth, 0} + offset_of_all_rooms + vec3{0, 0, 0}, persistent_rotation);
+	portal4 = new portal(room_height, room1_length, vec3{0.5f, room_depth, 0} + offset_of_all_rooms + vec3{room1_length + 1.0f, 0, 0}, persistent_rotation);
+	portal5 = new portal(room_height, room1_length, vec3{ room2_length - 1.5f, room_depth, 0 } + offset_of_all_rooms + vec3{room1_length + 1.0f, 0, 0}, persistent_rotation);
+	portal6 = new portal(room_height, room1_length, vec3{0.5f, room_depth, 0} + offset_of_all_rooms + vec3{room2_length + room1_length + 2.0f, 0, 0}, persistent_rotation);
+	portal7 = new portal(room_height, room1_length, vec3{ room3_length - 1.5f, room_depth, 0 } + offset_of_all_rooms + vec3{room2_length + room1_length + 2.0f, 0, 0}, persistent_rotation);
+
+	/*
+	portal2 = new portal(room_height, room1_length, vec3{ room1_length / 5.f * 0.5f, room_depth, 0 } + offset_of_all_rooms + vec3{0.f, 0.f, 0.f}, persistent_rotation);
+	portal3 = new portal(room_height, room1_length, vec3{ room1_length - room1_length / 5.f * 1.5f, room_depth, 0 } + offset_of_all_rooms + vec3{0, 0, 0}, persistent_rotation);
+	portal4 = new portal(room_height, room1_length, vec3{ room1_length / 5.f * 0.5f, room_depth, 0 } + offset_of_all_rooms + vec3{room1_length + 1.0f, 0, 0}, persistent_rotation);
+	portal5 = new portal(room_height, room1_length, vec3{ room2_length - room1_length / 5.f * 1.5f, room_depth, 0 } + offset_of_all_rooms + vec3{room1_length + 1.0f, 0, 0}, persistent_rotation);
+	portal6 = new portal(room_height, room1_length, vec3{ room1_length / 5.f * 0.5f, room_depth, 0 } + offset_of_all_rooms + vec3{room2_length + room1_length + 2.0f, 0, 0}, persistent_rotation);
+	portal7 = new portal(room_height, room1_length, vec3{ room3_length - room1_length / 5.f * 1.5f, room_depth, 0 } + offset_of_all_rooms + vec3{room2_length + room1_length + 2.0f, 0, 0}, persistent_rotation);
+	*/
+	
 	portal1->link_portals(*portal2);
 	portal3->link_portals(*portal4);
 	portal5->link_portals(*portal6);
@@ -213,6 +318,7 @@ void scene_structure::initialize()
 	portals_to_draw.push_back(portal6);
 	portals_to_draw.push_back(portal7);
 
+	/*
 	// // ***************************************** //
 	// // Set-up 4 rooms
 	// // ***************************************** //
@@ -250,6 +356,8 @@ void scene_structure::initialize()
 	// portals_to_draw.push_back(room1->get_portal_2());
 	// portals_to_draw.push_back(room2->get_portal_1());
 	// portals_to_draw.push_back(room2->get_portal_2());
+	*/
+
 }
 
 void scene_structure::display_frame()
@@ -267,98 +375,133 @@ void scene_structure::display_frame()
 		draw(global_frame, environment);
 }
 
-void scene_structure::set_view_m(cgp::mat4 &view_m)
+void scene_structure::set_view_m(cgp::mat4& view_m)
 {
 	environment.camera_view = view_m;
 	environment.light = cgp::inverse(view_m).col_w_vec3(); // MAYBE ALSO SET LIGHT OT VIEW M POSITION HERE??
 }
 
-void scene_structure::set_proj_m(cgp::mat4 &proj_m)
+void scene_structure::set_proj_m(cgp::mat4& proj_m)
 {
 	environment.camera_projection = proj_m;
 }
 
-void scene_structure::draw_non_portal(cgp::mat4 &view_m, cgp::mat4 &proj_m)
+void scene_structure::draw_non_portal(cgp::mat4& view_m, cgp::mat4& proj_m, int portal_num = -1)
 {
 	set_view_m(view_m);
 	set_proj_m(proj_m);
 
+	switch (portal_num)
 	{
-		// Drawing the forest scene
-		
-		draw(ground, environment);
-		draw(lake, environment);
+	case 0:
+		draw_non_portal_rooms();
+		break;
 
-		draw(pineTrunks, environment);
-		draw(pineFoliage, environment);
-		draw(treeTrunks, environment);
-		draw(treeFoliage, environment);
+	case 6:
+		//std::cout << "Passed by here LINK PORTALS" << std::endl;
+		draw_non_portal_field();
+		break;
 
-		draw(roof, environment);
-		draw(stone, environment);
-		draw(barrel, environment);
-		draw(wood, environment);
-		draw(house, environment);
+	case 1:
+		draw_non_portal_field();
+		break;
 
-		timer.update();
+	case 2:
+	case 3:
+	case 4:
+	case 5:
+		//std::cout << "Passed by here ROOM ONLY" << std::endl;
+		draw_non_portal_rooms();
+		break;
 
-		// Bunny animation
-		rotation_transform r_head = rotation_transform::from_axis_angle({0, 1, 0}, Pi / 6);
-		rotation_transform r_head_anim = rotation_transform::from_axis_angle({0, 1, 0}, 0.25f * cos(2 * timer.t));
-		hierarchy["head"].transform_local.rotation = r_head * r_head_anim;
-		hierarchy.update_local_to_global_coordinates();
-		hierarchy["body"].transform_local.scaling = 6;
-		hierarchy["body"].transform_local.translation = {3, 1, 0};
-		hierarchy["body"].transform_local.rotation = rotation_transform::from_axis_angle({0, 0, 1}, Pi / 2 + Pi / 8);
 
-		// Drawing the bunny
 
-		draw(hierarchy, environment);
-
-		if (gui.display_wireframe)
-		{
-			draw_wireframe(ground, environment);
-			draw_wireframe(lake, environment);
-
-			draw_wireframe(pineTrunks, environment);
-			draw_wireframe(pineFoliage, environment);
-			draw_wireframe(treeTrunks, environment);
-			draw_wireframe(treeFoliage, environment);
-
-			draw_wireframe(roof, environment);
-			draw_wireframe(stone, environment);
-			draw_wireframe(barrel, environment);
-			draw_wireframe(wood, environment);
-			draw_wireframe(house, environment);
-			draw_wireframe(hierarchy, environment);
-		}
-
-		// THE ROOMS
-
-		draw(room1, environment);
-		draw(groundroom1, environment);
-		draw(roof1, environment);
-		draw(room2, environment);
-		draw(groundroom2, environment);
-		draw(roof2, environment);
-		draw(room3, environment);
-		draw(groundroom3, environment);
-		draw(roof3, environment);
-		draw(monkey, environment);
-		draw(boat, environment);
-		draw(sofa, environment);
-
-		if (gui.display_wireframe)
-		{
-			draw_wireframe(room1, environment);
-			draw_wireframe(room2, environment);
-			draw_wireframe(room3, environment);
-		}
-	};
+	default:  // Non_portal draw (eg : portal_num = -1)
+		draw_non_portal_field();
+		draw_non_portal_rooms();
+		break;
+	}
 
 	// room1->draw(environment);
 	// room2->draw(environment);
 	// draw(player, environment);
+}
+
+void scene_structure::draw_non_portal_field()
+{
+	// Drawing the forest scene
+
+	draw(ground, environment);
+	draw(lake, environment);
+
+	draw(pineTrunks, environment);
+	draw(pineFoliage, environment);
+	draw(treeTrunks, environment);
+	draw(treeFoliage, environment);
+
+	draw(stone, environment);
+	draw(barrel, environment);
+	draw(wood, environment);
+	draw(roof, environment);
+	draw(house, environment);
+
+
+	timer.update();
+
+	// Bunny animation
+	rotation_transform r_head = rotation_transform::from_axis_angle({ 0, 1, 0 }, Pi / 6);
+	rotation_transform r_head_anim = rotation_transform::from_axis_angle({ 0, 1, 0 }, 0.25f * cos(2 * timer.t));
+	hierarchy["head"].transform_local.rotation = r_head * r_head_anim;
+	hierarchy.update_local_to_global_coordinates();
+	hierarchy["body"].transform_local.scaling = 6;
+	hierarchy["body"].transform_local.translation = { 3, 1, 0 };
+	hierarchy["body"].transform_local.rotation = rotation_transform::from_axis_angle({ 0, 0, 1 }, Pi / 2 + Pi / 8);
+
+	// Drawing the bunny
+
+	draw(hierarchy, environment);
+
+	if (gui.display_wireframe)
+	{
+		draw_wireframe(ground, environment);
+		draw_wireframe(lake, environment);
+
+		draw_wireframe(pineTrunks, environment);
+		draw_wireframe(pineFoliage, environment);
+		draw_wireframe(treeTrunks, environment);
+		draw_wireframe(treeFoliage, environment);
+
+		draw_wireframe(roof, environment);
+		draw_wireframe(stone, environment);
+		draw_wireframe(barrel, environment);
+		draw_wireframe(wood, environment);
+		draw_wireframe(house, environment);
+		draw_wireframe(hierarchy, environment);
+	}
+}
+
+void scene_structure::draw_non_portal_rooms()
+{
+	// THE ROOMS
+	draw(room1, environment);
+	draw(groundroom1, environment);
+	draw(roof1, environment);
+	draw(room2, environment);
+	draw(groundroom2, environment);
+	draw(roof2, environment);
+	draw(room3, environment);
+	draw(groundroom3, environment);
+	draw(roof3, environment);
+	draw(monkey, environment);
+	draw(boat, environment);
+	draw(sofa, environment);
+
+	if (gui.display_wireframe)
+	{
+		draw_wireframe(room1, environment);
+		draw_wireframe(room2, environment);
+		draw_wireframe(room3, environment);
+	}
 }
 
 // Much inspiration was taken from : https://github.com/ThomasRinsma/opengl-game-test/blob/8363bbfcce30acc458b8faacc54c199279092f81/src/scene.cc
@@ -449,7 +592,7 @@ void scene_structure::display_portals_recursion(cgp::mat4 view_m, cgp::mat4 proj
 
 			// Draw scene objects with destView, limited to stencil buffer
 			// use an edited projection matrix to set the near plane to the portal plane
-			draw_non_portal(p.second, proj_clipped_cgp);
+			draw_non_portal(p.second, proj_clipped_cgp, i);
 			// drawNonPortals(destView, projMat);
 		}
 		else
@@ -575,7 +718,7 @@ void scene_structure::update_camera_teleportation_through_portal()
 				std::pair<glm::mat4, cgp::mat4> p = portals_to_draw[i]->get_portal_view(cv, cf);
 				cgp::mat4 frame_after_mv = cgp::inverse(p.second);
 
-				camera_control.camera_model.look_at(cgp::inverse(p.second).col_w_vec3() + 0.001 * cgp::inverse(p.second).apply_to_vec3_vector({0.f, 0.f, 1.f}), cgp::inverse(p.second).col_w_vec3() - cgp::inverse(p.second).apply_to_vec3_vector({0.f, 0.f, 1.f}));
+				camera_control.camera_model.look_at(cgp::inverse(p.second).col_w_vec3() - 0.0001f * cgp::inverse(p.second).apply_to_vec3_vector({ 0.f, 0.f, 1.f }), cgp::inverse(p.second).col_w_vec3() - cgp::inverse(p.second).apply_to_vec3_vector({ 0.f, 0.f, 1.f }));
 				// display_frame();
 				return;
 			}

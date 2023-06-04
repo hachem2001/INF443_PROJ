@@ -120,9 +120,9 @@ bool portal_intersection(cgp::vec3 la, cgp::vec3 lb, portal& portal) {
             glm::vec4 p2 = convert_cgp_to_glm_vec4(p20);
             glm::vec4 p3 = convert_cgp_to_glm_vec4(p30);
 
-            std::cout << la << std::endl;
-            std::cout << lb << std::endl;
-            std::cout << p0.x << " " << p0.y << " " << p0.z << std::endl;
+            // std::cout << la << std::endl;
+            // std::cout << lb << std::endl;
+            // std::cout << p0.x << " " << p0.y << " " << p0.z << std::endl;
 
             // Solve line-plane intersection using parametric form
             glm::vec3 tuv =
