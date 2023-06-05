@@ -80,7 +80,7 @@ namespace cgp {
 
 
 		// Send uniforms for this shader
-		opengl_uniform(skybox.shader, "projection", environment.projection.matrix());
+		opengl_uniform(skybox.shader, "projection", environment.camera_projection);
 		opengl_uniform(skybox.shader, "view", environment.camera_view);
 		opengl_uniform(skybox.shader, "model", skybox.model);
 

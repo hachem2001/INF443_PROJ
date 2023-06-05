@@ -358,6 +358,15 @@ void scene_structure::initialize()
 	// portals_to_draw.push_back(room2->get_portal_2());
 	*/
 
+
+	// WE USED THIS CODE : https://github.com/drohmer/cgp/blob/main/examples/05_environment_map/02_environment_map/src/scene.cpp
+	// (Thanks M. Drohmer)
+	image_structure image_skybox_template = image_load_file("assets/skybox_02.jpg");
+	std::vector<image_structure> image_grid = image_split_grid(image_skybox_template, 4, 3);
+
+	skybox.initialize_data_on_gpu();
+	// Thanks to Thomas Dagonneau for the astuce of rotating the images
+	skybox.texture.initialize_cubemap_on_gpu(image_grid[7].rotate_90_degrees_counterclockwise(), image_grid[1].rotate_90_degrees_clockwise(), image_grid[4].rotate_90_degrees_clockwise().rotate_90_degrees_clockwise(), image_grid[10], image_grid[3], image_grid[5].rotate_90_degrees_clockwise().rotate_90_degrees_clockwise());
 }
 
 void scene_structure::display_frame()
@@ -430,6 +439,7 @@ void scene_structure::draw_non_portal(cgp::mat4& view_m, cgp::mat4& proj_m, int 
 void scene_structure::draw_non_portal_field()
 {
 	// Drawing the forest scene
+	// First the scene!
 
 	draw(ground, environment);
 	draw(lake, environment);
@@ -515,6 +525,9 @@ void scene_structure::display_portals_recursion(cgp::mat4 view_m, cgp::mat4 proj
 	// POUR LINSTANT : RIEN DE RECURSIF. Chuis pas assez fort pour ça.
 
 	// Draw scene objects normally, only at recursionLevel
+
+	draw(skybox, environment);
+
 
 	for (int i = 0; i < portals_to_draw.size(); i++)
 	{

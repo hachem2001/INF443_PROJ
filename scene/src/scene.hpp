@@ -117,6 +117,7 @@ struct scene_structure : cgp::scene_inputs_generic {
 	
 	// END ADDING WHAT IS DONE BY GAELLE
 
+	cgp::skybox_drawable skybox;
 
 	// mesh_drawable player;
 
